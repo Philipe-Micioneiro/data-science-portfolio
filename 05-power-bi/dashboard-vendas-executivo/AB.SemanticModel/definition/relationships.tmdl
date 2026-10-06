@@ -1,0 +1,16 @@
+relationship 054009e4-69ae-3902-e2df-11eea1f38713
+	fromColumn: F_orders.user_id
+	toColumn: D_users.user_id
+
+relationship c40f3815-c920-736e-7860-d35a53af2996
+	fromColumn: F_orders.product_id
+	toColumn: D_items.product_id
+
+relationship 324b65d9-43b8-eac9-9cd4-af120648b6f1
+	fromColumn: F_orders.order_date
+	toColumn: D_Calendar.Date
+
+relationship F_targets_D_users
+	fromColumn: D_targets.user_id
+	toColumn: D_users.user_id
+

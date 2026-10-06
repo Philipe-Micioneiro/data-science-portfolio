@@ -1,0 +1,45 @@
+table D_users
+	lineageTag: 95966ddf-0d3a-4dfc-a61e-210b2e2e67c5
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 3c510e95-b7af-4fc6-9748-f8db0d854cb8
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 4253d04c-276d-43c6-a9cf-f5e96cf2885e
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column city
+		dataType: string
+		lineageTag: 2cbfc7ef-707d-4dc9-909a-b3ca0d110e89
+		summarizeBy: none
+		sourceColumn: city
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_users = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents("C:\Users\escol\Downloads\PBI_users.xlsx"), null, true),
+				    Sheet1_Sheet = Fonte{[Item="Sheet1",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"user_id", Int64.Type}, {"category", type text}, {"city", type text}}),
+				    // Correção documentada: user_id 83095742 sem cidade em users.xlsx; valor recuperado por cruzamento manual com PBI_targets.xlsx, onde consta 'Rio de Janeiro'
+				    #"Cidade Tratada" = Table.TransformColumns(#"Tipo Alterado", {{"city", each if _ = null then "Rio de Janeiro" else if _ = "SP" then "São Paulo" else if _ = "RJ" then "Rio de Janeiro" else _, type text}})
+				in
+				    #"Cidade Tratada"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

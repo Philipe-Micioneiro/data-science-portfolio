@@ -1,0 +1,48 @@
+table 'Toggle Metrica v2'
+	lineageTag: aca56658-dcce-435c-a4b3-fd9ea4b0b508
+
+	column 'Toggle Metrica v2'
+		lineageTag: d7447151-976c-4508-853c-1212ab97b7e0
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Toggle Metrica v2 Pedido'
+
+		relatedColumnDetails
+			groupByColumn: 'Toggle Metrica v2 Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Toggle Metrica v2 Campos'
+		isHidden
+		lineageTag: 50c934a3-f3ae-49c5-a4d2-03ad07f84f24
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Toggle Metrica v2 Pedido'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Toggle Metrica v2 Pedido'
+		isHidden
+		formatString: 0
+		lineageTag: a71d7b91-f767-4111-8ae5-c048ede1867b
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Toggle Metrica v2' = calculated
+		mode: import
+		source =
+				{
+				    ("Total Revenue", NAMEOF('Medidas'[Total Revenue]), 0),
+				    ("Month-over-month growth (%)", NAMEOF('Medidas'[Month-over-month growth (%)]), 1)
+				}
+
+	annotation PBI_Id = fb62b65774a74e638787be5aca23e4b1
+

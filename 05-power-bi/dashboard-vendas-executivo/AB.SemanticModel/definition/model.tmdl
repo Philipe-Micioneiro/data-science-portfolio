@@ -1,0 +1,24 @@
+model Model
+	culture: pt-BR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: pt-BR
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["D_items","F_orders","D_targets","D_users"]
+
+annotation PBI_ProTooling = ["DevMode","MCP-PBIModeling"]
+
+ref table D_items
+ref table F_orders
+ref table D_targets
+ref table D_users
+ref table D_Calendar
+ref table Medidas
+ref table 'Toggle Metrica v2'
+
+ref cultureInfo pt-BR
+

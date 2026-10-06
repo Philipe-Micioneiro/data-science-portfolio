@@ -1,0 +1,114 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY26SU07",
+      "reportVersionAtImport": {
+        "visual": "2.11.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
+      },
+      "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "Executive_BEES7292224090612086.json",
+      "reportVersionAtImport": {
+        "visual": "2.11.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
+      },
+      "type": "RegisteredResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "publicCustomVisuals": [
+    "htmlContent443BE3AD55E043BF878BED274D3A6865",
+    "deneb7E15AEF80B9E4D4F8E12924291ECE89A"
+  ],
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY26SU07",
+          "path": "BaseThemes/CY26SU07.json",
+          "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "1_-_Panorama_Geral9235912279401299.svg",
+          "path": "1_-_Panorama_Geral9235912279401299.svg",
+          "type": "Image"
+        },
+        {
+          "name": "2_-_Evolucao_bar5229851582663968.svg",
+          "path": "2_-_Evolucao_bar5229851582663968.svg",
+          "type": "Image"
+        },
+        {
+          "name": "3_-_Portf_lio8536044607912359.svg",
+          "path": "3_-_Portf_lio8536044607912359.svg",
+          "type": "Image"
+        },
+        {
+          "name": "4_-_Customer_base25735226441132664.svg",
+          "path": "4_-_Customer_base25735226441132664.svg",
+          "type": "Image"
+        },
+        {
+          "name": "5_-_Conclusion_and_Next_Steps47140688079475923.svg",
+          "path": "5_-_Conclusion_and_Next_Steps47140688079475923.svg",
+          "type": "Image"
+        },
+        {
+          "name": "Executive_BEES7292224090612086.json",
+          "path": "Executive_BEES7292224090612086.json",
+          "type": "CustomTheme"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true,
+    "customMemoryLimit": "1048576",
+    "customTimeoutLimit": "225"
+  }
+}

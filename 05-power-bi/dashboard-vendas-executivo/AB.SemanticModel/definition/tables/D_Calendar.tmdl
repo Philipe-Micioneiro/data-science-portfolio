@@ -1,0 +1,395 @@
+table D_Calendar
+	lineageTag: d8f10ef4-f31a-4d0b-a9fe-504b9308d5db
+	dataCategory: Time
+
+	column Date
+		isUnique
+		formatString: General Date
+		lineageTag: 91d3fef5-b0de-43bd-a528-c5644e25c3b3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		formatString: 0
+		lineageTag: 3b55154e-ca2c-41e2-9943-f9bc3b0e8918
+		summarizeBy: sum
+		sourceColumn: [Ano]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Number'
+		formatString: 0
+		lineageTag: c1f2a199-7cdb-4ef2-83c1-16e3205fbe29
+		summarizeBy: sum
+		sourceColumn: [Mês Num]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Abbrev'
+		lineageTag: a9382ffc-2f5c-428b-bebb-d1982c53ee00
+		summarizeBy: none
+		sourceColumn: [Mês Abrev]
+		sortByColumn: 'Month Number'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		lineageTag: 264956fc-9f18-4087-97db-f7723d496ec4
+		summarizeBy: none
+		sourceColumn: [Trim]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Semana Ano'
+		formatString: 0
+		lineageTag: 4fed8bac-bc9a-4f99-80c2-204528b63ed4
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Semana Ano]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dia Semana'
+		formatString: 0
+		lineageTag: 756a8a8f-4618-40eb-a366-35f1bda1eb66
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Dia Semana]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dia do Mês'
+		formatString: 0
+		lineageTag: 52bc4919-8572-4c63-b98f-0ea939f754fd
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Dia do Mês]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiaMes
+		lineageTag: 81d871ea-dd50-4219-bf28-eaed5840bbca
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DiaMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiaMesTexto
+		lineageTag: c576f519-2eed-4fa5-9e27-26ba02953c93
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DiaMesTexto]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiaMesNomeCurto
+		lineageTag: 0d22e802-9af4-4e19-9c4e-69fff60600fc
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DiaMesNomeCurto]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiaMesNumero
+		formatString: 0
+		lineageTag: 44cedd56-39fb-49b6-a624-ee18e267dbc7
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [DiaMesNumero]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiaMesComAno
+		lineageTag: b7ffc43f-de39-477a-96fd-cead94a07102
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DiaMesComAno]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Name'
+		lineageTag: 192b4d8b-26d4-4128-9009-db6676a994c9
+		summarizeBy: none
+		sourceColumn: [Mês Nome]
+		sortByColumn: 'Year Month Number'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Month'
+		lineageTag: 902a0b6d-8ab9-42d3-9612-65c07151dec3
+		summarizeBy: none
+		sourceColumn: [AnoMes]
+		sortByColumn: 'Month Number'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Year'
+		lineageTag: 950218f9-c32e-498d-9565-655945a16bd3
+		summarizeBy: none
+		sourceColumn: [MesAnoNome]
+		sortByColumn: 'Year Month Number'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Month Number'
+		formatString: 0
+		lineageTag: ec7f9a20-fd27-4bac-9076-8e7b847187fb
+		summarizeBy: sum
+		sourceColumn: [AnoMesNum]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Quarter'
+		formatString: 0
+		lineageTag: b9ea1e9b-7447-4e03-b9b9-77ab9f4705f6
+		summarizeBy: sum
+		sourceColumn: [AnoTrimestre]
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnoSemana
+		formatString: 0
+		lineageTag: 279fe80c-abeb-47a4-91c2-b0813d452213
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [AnoSemana]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ISO_Semana
+		formatString: 0
+		lineageTag: d8815c56-3011-4459-9bb7-065f89460da6
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [ISO_Semana]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ISO_Ano
+		formatString: 0
+		lineageTag: bff2d970-67d9-4735-991c-7557b894f8c0
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [ISO_Ano]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ISO_AnoSemana
+		formatString: 0
+		lineageTag: 6c9f75a0-6f71-4deb-ae57-6441165c4186
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [ISO_AnoSemana]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiaSemanaNumero
+		formatString: 0
+		lineageTag: cd2fd81a-03fb-4c1c-9e27-6af46f8cd864
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [DiaSemanaNumero]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiaSemanaNome
+		lineageTag: 52064a2f-ff23-4468-ada5-9392ee738342
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DiaSemanaNome]
+
+		annotation SummarizationSetBy = Automatic
+
+	column EhFimDeSemana
+		formatString: 0
+		lineageTag: a44da3c1-21f3-496e-8fea-aa000435a13a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [EhFimDeSemana]
+
+		annotation SummarizationSetBy = Automatic
+
+	column EhDiaUtil
+		formatString: 0
+		lineageTag: 34c56d4e-116c-4ddd-b478-00a4f9b1bc04
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [EhDiaUtil]
+
+		annotation SummarizationSetBy = Automatic
+
+	column InicioDoMes
+		formatString: General Date
+		lineageTag: 4504d370-8c5f-4e5d-bcd4-8a6883b7a30a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [InicioDoMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column FimDoMes
+		formatString: General Date
+		lineageTag: 95818c65-9c09-4402-ab34-e85f39cdd9d6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [FimDoMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column InicioDoTrimestre
+		formatString: General Date
+		lineageTag: 5d7bc146-332e-4e8e-aa8d-2281a7079ba0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [InicioDoTrimestre]
+
+		annotation SummarizationSetBy = Automatic
+
+	column FimDoTrimestre
+		formatString: General Date
+		lineageTag: 1715dfad-74b6-4c4c-bfa6-0abb5108277b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [FimDoTrimestre]
+
+		annotation SummarizationSetBy = Automatic
+
+	column InicioDoAno
+		formatString: General Date
+		lineageTag: 4154b1df-f656-4091-8bac-00d4cb1a4120
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [InicioDoAno]
+
+		annotation SummarizationSetBy = Automatic
+
+	column FimDoAno
+		formatString: General Date
+		lineageTag: 3c074663-1c66-4ec9-9762-8dfb24df9a69
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [FimDoAno]
+
+		annotation SummarizationSetBy = Automatic
+
+	column EhPrimeiroDiaMes
+		formatString: 0
+		lineageTag: 4b19bef9-6ce3-44fc-9237-30418b472ab7
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [EhPrimeiroDiaMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column EhUltimoDiaMes
+		formatString: 0
+		lineageTag: ffd9aa81-6236-42fd-89ed-a5c74e32368c
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [EhUltimoDiaMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_Calendario = calculated
+		mode: import
+		source = ```
+				
+				VAR DataInicial =
+				    CALCULATE (
+				        MIN ( F_Orders[order_date] ),
+				        ALL ( F_Orders )
+				    )
+				
+				VAR DataFinal =
+				    CALCULATE (
+				        MAX ( F_Orders[order_date] ),
+				        ALL ( F_Orders )
+				    )
+				
+				RETURN
+				ADDCOLUMNS (
+				    CALENDAR ( DataInicial, DataFinal ),
+				
+				    // === Year / Month ===
+				    "Ano", YEAR ( [Date] ),
+				    "Mês Num", MONTH ( [Date] ),
+				    "Mês Abrev", FORMAT ( [Date], "MMM", "en-US" ),
+				    "Mês Nome", FORMAT ( [Date], "MMMM", "en-US" ),
+				
+				    // === Year-Month ===
+				    "AnoMes", FORMAT ( [Date], "YYYYMM" ),
+				    "MesAnoNome", FORMAT ( [Date], "MMMM YYYY", "en-US" ),
+				    "AnoMesNum", YEAR ( [Date] ) * 100 + MONTH ( [Date] ),
+				
+				    // === Quarter ===
+				    "Trim", FORMAT ( [Date], "q" ),
+				    "AnoTrimestre", YEAR ( [Date] ) * 10 + QUARTER ( [Date] ),
+				
+				    // === Week ===
+				    "Semana Ano", WEEKNUM ( [Date] ),
+				    "AnoSemana", YEAR ( [Date] ) * 100 + WEEKNUM ( [Date], 2 ),
+				
+				    // === ISO Week ===
+				    "ISO_Semana", WEEKNUM ( [Date], 21 ),
+				    "ISO_Ano", YEAR ( [Date] - WEEKDAY ( [Date], 2 ) + 4 ),
+				    "ISO_AnoSemana",
+				        ( YEAR ( [Date] - WEEKDAY ( [Date], 2 ) + 4 ) * 100 )
+				        + WEEKNUM ( [Date], 21 ),
+				
+				    // === Day ===
+				    "Dia do Mês", DAY ( [Date] ),
+				    "Dia Semana", WEEKDAY ( [Date] ),
+				    "DiaSemanaNumero", WEEKDAY ( [Date], 2 ),
+				    "DiaSemanaNome", FORMAT ( [Date], "dddd", "en-US" ),
+				
+				    // === Day-Month ===
+				    "DiaMes", FORMAT ( [Date], "dd/MM" ),
+				    "DiaMesTexto", FORMAT ( [Date], "dd MMMM", "en-US" ),
+				    "DiaMesNomeCurto", FORMAT ( [Date], "dd MMM", "en-US" ),
+				    "DiaMesNumero", MONTH ( [Date] ) * 100 + DAY ( [Date] ),
+				    "DiaMesComAno", FORMAT ( [Date], "dd/MM/yyyy" ),
+				
+				    // === Flags ===
+				    "EhFimDeSemana", IF ( WEEKDAY ( [Date], 2 ) >= 6, 1, 0 ),
+				    "EhDiaUtil", IF ( WEEKDAY ( [Date], 2 ) <= 5, 1, 0 ),
+				
+				    // === Period start/end ===
+				    "InicioDoMes", DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 ),
+				    "FimDoMes", EOMONTH ( [Date], 0 ),
+				
+				    "InicioDoTrimestre",
+				        DATE (
+				            YEAR ( [Date] ),
+				            ( QUARTER ( [Date] ) * 3 ) - 2,
+				            1
+				        ),
+				
+				    "FimDoTrimestre",
+				        EOMONTH (
+				            DATE (
+				                YEAR ( [Date] ),
+				                QUARTER ( [Date] ) * 3,
+				                1
+				            ),
+				            0
+				        ),
+				
+				    "InicioDoAno", DATE ( YEAR ( [Date] ), 1, 1 ),
+				    "FimDoAno", DATE ( YEAR ( [Date] ), 12, 31 ),
+				
+				    // === Closing flags ===
+				    "EhPrimeiroDiaMes",
+				        IF ( [Date] = DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 ), 1, 0 ),
+				
+				    "EhUltimoDiaMes",
+				        IF ( [Date] = EOMONTH ( [Date], 0 ), 1, 0 )
+				)
+				
+				```
+
+	annotation PBI_Id = 89b03f08e71f4188a4c8d8ac57cce3e1
+

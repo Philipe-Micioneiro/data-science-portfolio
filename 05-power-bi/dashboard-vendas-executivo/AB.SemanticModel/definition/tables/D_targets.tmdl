@@ -1,0 +1,38 @@
+table D_targets
+	lineageTag: a5b28ae9-1f3d-40f4-8def-6a1104da959d
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 933f647e-d0c3-46cb-8e57-3c37a9b31a97
+		summarizeBy: sum
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'monthly revenue target'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6a1edd2a-5186-48d3-a223-d1ec136cddc8
+		summarizeBy: sum
+		sourceColumn: monthly revenue target
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_targets = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents("C:\Users\escol\Downloads\PBI_targets.xlsx"), null, true),
+				    Sheet1_Sheet = Fonte{[Item="Sheet1",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"user_id", Int64.Type}, {"category", type text}, {"city", type text}, {"monthly revenue target", Int64.Type}}),
+				    // category/city são redundantes com D_users (mesma FK user_id); removidas para evitar ambiguidade no Star Schema
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Tipo Alterado", {"category", "city"})
+				in
+				    #"Colunas Removidas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,37 @@
+table D_items
+	lineageTag: d740654d-f26f-4672-b24f-63d4c0eeda5b
+
+	column product_id
+		dataType: int64
+		formatString: 0
+		lineageTag: f1f85371-d2ea-4f86-a738-1b55f926b5bf
+		summarizeBy: none
+		sourceColumn: item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 3e8f9c1f-fe38-49b5-ab18-66c8f4052b12
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_items = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents("C:\Users\escol\Downloads\PBI_items.xlsx"), null, true),
+				    items_Sheet = Fonte{[Item="items",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(items_Sheet, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"item_id", Int64.Type}, {"category", type text}}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Tipo Alterado", {"item_id"}),
+				    #"Categoria Tratada" = Table.ReplaceValue(#"Duplicatas Removidas", null, "Não Especificado", Replacer.ReplaceValue, {"category"})
+				in
+				    #"Categoria Tratada"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

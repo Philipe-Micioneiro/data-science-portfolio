@@ -1,0 +1,68 @@
+table F_orders
+	lineageTag: de21145a-122c-4aa2-bb96-869e8d36cbed
+
+	column order_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 3cee74db-8a58-42f3-976a-04b7fb583859
+		summarizeBy: sum
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: b072bb26-f231-43b0-96f2-b5d1d3614200
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 0f6fc9be-5ab3-4ac4-a3c0-25ebdcbc1843
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: int64
+		formatString: 0
+		lineageTag: f6ae45b3-1eca-4130-a96a-4bfc7f51fae2
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column revenue
+		dataType: double
+		lineageTag: ffd29884-d523-4f77-bdd3-cd3ce8893fe9
+		summarizeBy: none
+		sourceColumn: revenue
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition F_orders = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents("C:\Users\escol\Downloads\PBI_orders.xlsx"), null, true),
+				    orders_Sheet = Fonte{[Item="orders",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(orders_Sheet, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"order_id", Int64.Type}, {"order_date", type date}, {"user_id", Int64.Type}, {"product_id", Int64.Type}, {"revenue", type number}}),
+				    // 9 linhas totalmente duplicadas identificadas na auditoria (mesmo order_id+product_id+revenue+data+cliente repetido) - removidas explicitamente
+				    #"Duplicatas Removidas" = Table.Distinct(#"Tipo Alterado")
+				in
+				    #"Duplicatas Removidas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

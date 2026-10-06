@@ -1,0 +1,855 @@
+table Medidas
+	lineageTag: ee7ec310-c1e1-4276-a0f6-a297c6b30fdc
+
+	measure 'Total Revenue' = SUMX(VALUES(F_orders[order_id]), CALCULATE(MAX(F_orders[revenue])))
+		formatString: R$ #,##0.00
+		displayFolder: 01 KPIs Principais
+		lineageTag: 2687a1aa-0e25-4476-9f4b-612a0db5094f
+
+	measure 'Order Count' = DISTINCTCOUNT(F_orders[order_id])
+		formatString: #,##0
+		displayFolder: 01 KPIs Principais
+		lineageTag: 18f78c1f-becd-4081-ac27-ef3b3c8f4d83
+
+	measure 'Active Clients' = DISTINCTCOUNT(F_orders[user_id])
+		formatString: #,##0
+		displayFolder: 01 KPIs Principais
+		lineageTag: 3406ac1a-f617-4c4a-8264-1b53dd3afc0f
+
+	measure 'Average Ticket' = DIVIDE([Total Revenue], DISTINCTCOUNT(F_orders[order_id]), 0)
+		formatString: R$ #,##0.00
+		displayFolder: 01 KPIs Principais
+		lineageTag: 0935c65a-6087-419b-b0f9-b1eb44b9dd9c
+
+	measure 'Month-over-month growth (%)' =
+			VAR RevenueCurrentMonth = [Total Revenue]
+			VAR RevenuePreviousMonth = CALCULATE([Total Revenue], DATEADD(D_Calendar[Date], -1, MONTH))
+			RETURN DIVIDE(RevenueCurrentMonth - RevenuePreviousMonth, RevenuePreviousMonth, BLANK())
+		formatString: 0.0%;-0.0%
+		displayFolder: 01 KPIs Principais
+		lineageTag: 2849fa48-6199-4efb-854e-3e169b1b0d11
+
+	measure 'Year-to-date revenue' = TOTALYTD([Total Revenue], D_Calendar[Date])
+		formatString: R$ #,##0.00
+		displayFolder: 01 KPIs Principais
+		lineageTag: 7a19fc64-9bd7-4fc8-a745-407719ce7042
+
+	/// Nota metodológica: revenue está no grau do pedido (repetido em cada linha de item), não há preço/quantidade por SKU. Este ranking reflete a receita de pedidos que contém cada produto (exposição de receita), não uma quebra exata de faturamento por SKU. Pedidos multi-produto são contados em mais de um produto.
+	measure 'Top 5 products' = CALCULATE([Total Revenue], KEEPFILTERS(TOPN(5, ALL(D_items[product_id]), CALCULATE([Total Revenue]), DESC)))
+		formatString: R$ #,##0.00
+		displayFolder: 01 KPIs Principais
+		lineageTag: dc930e8c-38a6-4477-830b-dc1349723ddb
+
+	measure 'Total Monthly Target' = SUM(D_targets[monthly revenue target])
+		formatString: R$ #,##0.00
+		displayFolder: 02 Metas (BEES)
+		lineageTag: bf69328c-db5b-494c-b048-5ef224eb247b
+
+	measure '% Target Achievement' = DIVIDE([Total Revenue], [Total Period Target], BLANK())
+		formatString: 0.0%;-0.0%
+		displayFolder: 02 Metas (BEES)
+		lineageTag: c68fa473-9d00-4a8e-b7d2-ff0da33a21b0
+
+	measure 'Clients Below Target Count' = COUNTROWS(FILTER(VALUES(D_users[user_id]), [% Target Achievement] < 1))
+		formatString: #,##0
+		displayFolder: 02 Metas (BEES)
+		lineageTag: 9dcef784-9ed7-4421-98c8-c95832d1e968
+
+	/// Receita de pedidos que contêm ao menos um produto Beyond Beer (nab/liquor/soda). Pedidos multi-categoria também contam em Beer, por isso a soma das categorias pode superar o Total Revenue. Métrica de exposição de receita, não uma quebra exata por categoria.
+	measure 'Beyond Beer Revenue' = CALCULATE([Total Revenue], D_items[category] IN {"nab","liquor","soda"})
+		formatString: R$ #,##0.00
+		displayFolder: 03 Portfolio
+		lineageTag: 4831e3d4-140e-4059-a64c-f06ba0940278
+
+	/// % dos pedidos (por receita) que envolvem ao menos um produto Beyond Beer. Ver nota em [Beyond Beer Revenue] sobre sobreposição entre categorias.
+	measure '% Beyond Beer Share' = DIVIDE([Beyond Beer Revenue], [Total Revenue], BLANK())
+		formatString: 0.0%;-0.0%
+		displayFolder: 03 Portfolio
+		lineageTag: 2765534c-f2b9-495b-bf88-5ce8456e8ac1
+
+	measure 'Leading Product Category' =
+			VAR TopCat = TOPN(1, ALL(D_items[category]), CALCULATE([Total Revenue]), DESC)
+			RETURN CALCULATE(SELECTEDVALUE(D_items[category]), TopCat)
+		displayFolder: 03 Portfolio
+		lineageTag: 31a01417-668f-4d57-ad78-aabec0a511f7
+
+	measure 'Top Product ID' =
+			VAR TopP = TOPN(1, ALL(D_items[product_id]), CALCULATE([Total Revenue]), DESC)
+			RETURN CALCULATE(SELECTEDVALUE(D_items[product_id]), TopP)
+		displayFolder: 03 Portfolio
+		lineageTag: eed769c9-56f1-4068-8967-560d00dc1f98
+
+	measure 'Leading City' =
+			VAR TopCity = TOPN(1, ALL(D_users[city]), CALCULATE([Total Revenue]), DESC)
+			RETURN CALCULATE(SELECTEDVALUE(D_users[city]), TopCity)
+		displayFolder: 04 Cliente
+		lineageTag: 5b17cc81-16ed-42bd-90d1-2dc18a99a615
+
+	measure 'Leading Client Category' =
+			VAR TopSeg = TOPN(1, ALL(D_users[category]), CALCULATE([Total Revenue]), DESC)
+			RETURN CALCULATE(SELECTEDVALUE(D_users[category]), TopSeg)
+		displayFolder: 04 Cliente
+		lineageTag: 8c2c0cfa-63dd-4e72-a7d3-b6cdf1985deb
+
+	measure 'Best Month Name' =
+			VAR MonthsTable = ADDCOLUMNS(SUMMARIZE(ALL(D_Calendar), D_Calendar[Year Month], D_Calendar[Month Year]), "@Rev", CALCULATE([Total Revenue]))
+			VAR TopMonth = TOPN(1, MonthsTable, [@Rev], DESC)
+			RETURN MAXX(TopMonth, D_Calendar[Month Year])
+		displayFolder: 05 Apoio Narrativa
+		lineageTag: d826c073-5f9a-40fa-b8b5-bf45c202cc84
+
+	measure 'Best Month Revenue' =
+			VAR MonthsTable = ADDCOLUMNS(SUMMARIZE(ALL(D_Calendar), D_Calendar[Year Month]), "@Rev", CALCULATE([Total Revenue]))
+			RETURN MAXX(MonthsTable, [@Rev])
+		formatString: R$ #,##0.00
+		displayFolder: 05 Apoio Narrativa
+		lineageTag: 003802ed-9fce-4cde-844b-b2c460a32405
+
+	measure 'Worst MoM Month Name' =
+			VAR MonthsTable = ADDCOLUMNS(SUMMARIZE(ALL(D_Calendar), D_Calendar[Year Month], D_Calendar[Month Year]), "@MoM", CALCULATE([Month-over-month growth (%)]))
+			VAR Filtrado = FILTER(MonthsTable, NOT ISBLANK([@MoM]))
+			VAR BottomMonth = TOPN(1, Filtrado, [@MoM], ASC)
+			RETURN MAXX(BottomMonth, D_Calendar[Month Year])
+		displayFolder: 05 Apoio Narrativa
+		lineageTag: 7a2808ce-a3c7-4bc2-8b9c-037025bd6aaf
+
+	measure 'Worst MoM Value' =
+			VAR MonthsTable = ADDCOLUMNS(SUMMARIZE(ALL(D_Calendar), D_Calendar[Year Month]), "@MoM", CALCULATE([Month-over-month growth (%)]))
+			VAR Filtrado = FILTER(MonthsTable, NOT ISBLANK([@MoM]))
+			RETURN MINX(Filtrado, [@MoM])
+		formatString: 0.0%;-0.0%
+		displayFolder: 05 Apoio Narrativa
+		lineageTag: 87a98b27-0068-4180-8337-3d779ec00314
+
+	measure 'Months In Context' = DISTINCTCOUNT(D_Calendar[Year Month])
+		isHidden
+		displayFolder: 02 Metas (BEES)
+		lineageTag: 8edf0bfc-3b3a-4431-8c02-12d58758a116
+
+	measure 'Total Period Target' = [Total Monthly Target] * [Months In Context]
+		formatString: R$ #,##0.00
+		displayFolder: 02 Metas (BEES)
+		lineageTag: e3ba3c20-a145-4964-8123-81bc2ece7e88
+
+	measure 'Top 2 Clients Share' =
+			VAR ClientTable = ADDCOLUMNS(VALUES(D_users[user_id]), "@Rev", CALCULATE([Total Revenue]))
+			VAR Top2 = TOPN(2, ClientTable, [@Rev], DESC)
+			VAR Top2Revenue = SUMX(Top2, [@Rev])
+			RETURN DIVIDE(Top2Revenue, [Total Revenue], BLANK())
+		formatString: 0.0%
+		isHidden
+		displayFolder: 05 Apoio Narrativa
+		lineageTag: 8fd759a8-ec88-4ae5-a660-a887255db8a5
+
+	measure 'Raw Revenue No Dedup' = SUM(F_orders[revenue])
+		formatString: R$ #,##0.00
+		isHidden
+		displayFolder: 05 Apoio Narrativa
+		lineageTag: a3fbf535-c971-40cc-93eb-6cb68a35b420
+
+	measure 'Narr P1 Faturamento' = "Total revenue for the period is " & FORMAT([Total Revenue], "R$ #,##0.00", "en-US") & ", with an average ticket of " & FORMAT([Average Ticket], "R$ #,##0.00", "en-US") & " per order."
+		displayFolder: 06 Narrativa P1 Panorama
+		lineageTag: b4dbbcd7-cb09-40a3-b99d-30b5021e9d47
+
+	measure 'Narr P1 Crescimento' = "Month-over-month growth (last closed month) is at " & FORMAT([MoM (Último Mês)], "0.0%", "en-US") & "."
+		displayFolder: 06 Narrativa P1 Panorama
+		lineageTag: eebbec16-f448-4adb-a61c-bbd80e038e83
+
+	measure 'Narr P1 YTD' = "Year-to-date accumulated revenue reaches " & FORMAT([Year-to-date revenue], "R$ #,##0.00", "en-US") & "."
+		displayFolder: 06 Narrativa P1 Panorama
+		lineageTag: ca11febe-4d80-40fd-845b-38b5592e9c8d
+
+	measure 'Narr P1 Meta' = "The portfolio reached " & FORMAT([% Target Achievement], "0.0%", "en-US") & " of the defined monthly target, with " & FORMAT([Clients Below Target Count], "0", "en-US") & " clients still below objective."
+		displayFolder: 06 Narrativa P1 Panorama
+		lineageTag: 84dc7e0e-2707-467b-999d-9db217e769c9
+
+	measure 'Narr P1 Operacao' = "The operation counts " & FORMAT([Active Clients], "0", "en-US") & " active clients and " & FORMAT([Order Count], "#,##0", "en-US") & " orders processed."
+		displayFolder: 06 Narrativa P1 Panorama
+		lineageTag: 67bbbf06-eefe-4c3a-bdd8-d41fe252db0b
+
+	measure 'Narr P2 MelhorMes' = "The best-performing month was " & [Best Month Name] & ", with revenue of " & FORMAT([Best Month Revenue], "R$ #,##0.00", "en-US") & "."
+		displayFolder: 07 Narrativa P2 Evolucao
+		lineageTag: 22987a08-6343-42c7-922f-faf33b4c71d5
+
+	measure 'Narr P2 PiorMes' = "The largest month-over-month drop occurred in " & [Worst MoM Month Name] & ", with a decline of " & FORMAT([Worst MoM Value], "0.0%", "en-US") & "."
+		displayFolder: 07 Narrativa P2 Evolucao
+		lineageTag: 4544e936-2769-4fe2-bc28-94fd5f88e4d7
+
+	measure 'Narr P2 YTD' = "Year-to-date revenue represents " & FORMAT([Year-to-date revenue], "R$ #,##0.00", "en-US") & " — use the controls alongside to switch between absolute and percentage views."
+		displayFolder: 07 Narrativa P2 Evolucao
+		lineageTag: 12ff0a04-6062-41dd-86b5-349d085ae350
+
+	measure 'Narr P3 Categoria' = "The " & [Leading Product Category] & " category leads portfolio revenue."
+		displayFolder: 08 Narrativa P3 Portfolio
+		lineageTag: e9dd2792-a6ec-4630-bc5d-18a42cdcd788
+
+	measure 'Narr P3 BeyondBeer' = "Beyond Beer categories (non-alcoholic, spirits and soft drinks) account for " & FORMAT([% Beyond Beer Share], "0.0%", "en-US") & " of revenue — the BEES strategic diversification frontier."
+		displayFolder: 08 Narrativa P3 Portfolio
+		lineageTag: bbe04e20-dd8a-455a-8ed8-ac866dc7ea87
+
+	measure 'Narr P3 TopSKU' = "The top-earning SKU is product " & FORMAT([Top Product ID], "0", "en-US") & ", featured in the period's Top 5."
+		displayFolder: 08 Narrativa P3 Portfolio
+		lineageTag: 970e59f4-53c3-4e77-98df-328a6e1e521d
+
+	measure 'Narr P4 Segmento' = "The " & [Leading Client Category] & " segment generates the most revenue in the portfolio."
+		displayFolder: 09 Narrativa P4 Carteira
+		lineageTag: 45eaec3e-5623-4819-9a53-dbf445397dfa
+
+	measure 'Narr P4 Cidade' = "The city with the highest revenue is " & [Leading City] & "."
+		displayFolder: 09 Narrativa P4 Carteira
+		lineageTag: 8a2e033a-0aa0-4234-897d-724cc92d060b
+
+	measure 'Narr P4 Meta' = FORMAT([Clients Below Target Count], "0", "en-US") & " clients are below 100% of their monthly target — a direct commercial action opportunity via BEES."
+		displayFolder: 09 Narrativa P4 Carteira
+		lineageTag: 506281f5-4831-44ce-97a1-4d72842b34a2
+
+	measure 'Narr P4 Ticket' = "The portfolio's average ticket is " & FORMAT([Average Ticket], "R$ #,##0.00", "en-US") & " per order."
+		displayFolder: 09 Narrativa P4 Carteira
+		lineageTag: 2e207590-42e9-43f0-8aab-3fcff6ac5ac1
+
+	measure 'Narr P5 Concentracao' = "Critical concentration: the top 2 clients account for " & FORMAT([Top 2 Clients Share], "0.0%", "en-US") & " of total revenue — the portfolio depends on very few accounts."
+		displayFolder: 10 Narrativa P5 Conclusao
+		lineageTag: 28b8f445-f113-4043-920e-fb61227da658
+
+	measure 'Narr P5 BeyondBeer' = "Beyond Beer accounts for " & FORMAT([% Beyond Beer Share], "0.0%", "en-US") & " of revenue exposure, yet no product from these categories reaches the Top 5."
+		displayFolder: 10 Narrativa P5 Conclusao
+		lineageTag: a7b490a0-56e5-40f4-8768-689f62ac2fb4
+
+	measure 'Narr P5 Auditoria' = "Data audit: a naive sum of revenue would reach " & FORMAT([Raw Revenue No Dedup], "R$ #,##0.00", "en-US") & ", corrected to " & FORMAT([Total Revenue], "R$ #,##0.00", "en-US") & " via order-level deduplication."
+		displayFolder: 10 Narrativa P5 Conclusao
+		lineageTag: e8f07500-6870-479d-bca0-57ebb71dcc2d
+
+	measure 'Narr P5 Escala' = "Scale note: " & FORMAT([Active Clients], "0", "en-US") & " clients and " & FORMAT([Order Count], "#,##0", "en-US") & " orders — the model is ready to scale without structural changes."
+		displayFolder: 10 Narrativa P5 Conclusao
+		lineageTag: fd9ed340-76e4-4d77-9cc0-2aae9220463a
+
+	/// Se um mês específico estiver selecionado (slicer, linha de tabela/gráfico por mês), calcula o MoM daquele mês. Se nenhum mês estiver selecionado, usa o último mês disponível dentro do que estiver filtrado (ano/cidade/categoria). Use esta no card executivo da Página 1.
+	measure 'MoM (Último Mês)' =
+			IF(
+			    HASONEVALUE(D_Calendar[Year Month Number]),
+			    [Month-over-month growth (%)],
+			    VAR LastMonthInContext =
+			        CALCULATE(
+			            MAX(D_Calendar[Year Month Number]),
+			            ALLSELECTED(D_Calendar)
+			        )
+			    RETURN
+			        CALCULATE(
+			            [Month-over-month growth (%)],
+			            D_Calendar[Year Month Number] = LastMonthInContext
+			        )
+			)
+		formatString: 0.0%;-0.0%
+		displayFolder: 01 KPIs Principais
+		lineageTag: 24d7fc7b-6d84-44a8-98f8-ab8d8ff91a1f
+
+	measure 'Narr P1 Full' = [Narr P1 Faturamento] & UNICHAR(10) & UNICHAR(10) & [Narr P1 Crescimento] & UNICHAR(10) & UNICHAR(10) & [Narr P1 YTD] & UNICHAR(10) & UNICHAR(10) & [Narr P1 Meta] & UNICHAR(10) & UNICHAR(10) & [Narr P1 Operacao]
+		displayFolder: 06 Narrativa P1 Panorama
+		lineageTag: 9d13f807-609d-476a-b7c6-a84fe33bcc6a
+
+	measure 'Narr P2 Full' = [Narr P2 MelhorMes] & UNICHAR(10) & UNICHAR(10) & [Narr P2 PiorMes] & UNICHAR(10) & UNICHAR(10) & [Narr P2 Consistency] & UNICHAR(10) & UNICHAR(10) & [Narr P2 YTD]
+		displayFolder: 07 Narrativa P2 Evolucao
+		lineageTag: c3f7bea6-25bf-4b56-bc1e-1f986f781506
+
+	measure 'Narr P3 Full' = [Narr P3 Categoria] & UNICHAR(10) & UNICHAR(10) & [Narr P3 Mix] & UNICHAR(10) & UNICHAR(10) & [Narr P3 BeyondBeer] & UNICHAR(10) & UNICHAR(10) & [Narr P3 TopSKU]
+		displayFolder: 08 Narrativa P3 Portfolio
+		lineageTag: aea9faa0-66e6-41fe-bf92-dce52dbb3ddf
+
+	measure 'Narr P4 Full' = [Narr P4 Segmento] & UNICHAR(10) & UNICHAR(10) & [Narr P4 Cidade] & UNICHAR(10) & UNICHAR(10) & [Narr P4 Geography] & UNICHAR(10) & UNICHAR(10) & [Narr P4 Meta] & UNICHAR(10) & UNICHAR(10) & [Narr P4 Ticket]
+		displayFolder: 09 Narrativa P4 Carteira
+		lineageTag: 9a1d1be2-d42a-4d5c-8565-adff6f401cab
+
+	measure 'Narr P5 Full' =
+			VAR NL = UNICHAR(10) & UNICHAR(10)
+			RETURN
+			"KEY FINDINGS" & NL &
+			"• Revenue is highly concentrated: the top 2 clients account for " & FORMAT([Top 2 Clients Share],"0.0%","en-US") & " of total revenue — the portfolio depends on very few accounts." & NL &
+			"• Beer dominates the portfolio; Beyond Beer reaches " & FORMAT([% Beyond Beer Share],"0.0%","en-US") & " of revenue exposure, yet no product from these categories reaches the Top 5." & NL &
+			"• Performance is volatile month to month: the strongest month was " & [Best Month Name] & " (" & FORMAT([Best Month Revenue],"R$ #,##0","en-US") & "), while the sharpest drop was " & [Worst MoM Month Name] & " (" & FORMAT([Worst MoM Value],"0.0%","en-US") & ")." & NL &
+			"• Only " & FORMAT([Clients On Target Count],"0","en-US") & " of " & FORMAT([Active Clients],"0","en-US") & " clients are meeting their monthly target, leaving a combined gap of " & FORMAT([Target Gap Amount],"R$ #,##0","en-US") & " to close." & NL &
+			"RECOMMENDATIONS" & NL &
+			"• Prioritize clients closest to their target first — the fastest path to closing the " & FORMAT([Target Gap Amount],"R$ #,##0","en-US") & " gap is converting near-misses, not chasing the furthest accounts." & NL &
+			"• Reduce dependency on the top 2 accounts by developing the next tier through BEES — losing either one would remove close to " & FORMAT([Top 2 Clients Share],"0%","en-US") & " of revenue overnight." & NL &
+			"• Test Beyond Beer bundling with the highest-ticket clients to grow basket size without acquiring new accounts." & NL &
+			"FUTURE RESEARCH OPPORTUNITIES" & NL &
+			"• Item-level pricing and quantity data for a true market basket analysis and SKU-level revenue split." & NL &
+			"• Cost and margin (COGS) data to validate the Beyond Beer margin thesis." & NL &
+			"• Multi-year history to separate real seasonality from single-year noise." & NL &
+			"• Local market potential data per client to explain target variance." & NL &
+			"• Product category × client segment cross-analysis once the client base supports that granularity." & NL &
+			"• Validate whether the " & FORMAT([Top 2 Clients Share],"0.0%","en-US") & " concentration holds as the portfolio grows." & NL &
+			"METHODOLOGY & SCOPE" & NL &
+			"• Data audit: a naive sum of revenue would reach " & FORMAT([Raw Revenue No Dedup],"R$ #,##0.00","en-US") & ", corrected to " & FORMAT([Total Revenue],"R$ #,##0.00","en-US") & " via order-level deduplication." & NL &
+			"• Scale note: based on " & FORMAT([Active Clients],"0","en-US") & " clients and " & FORMAT([Order Count],"#,##0","en-US") & " orders across " & FORMAT([Months In Context],"0","en-US") & " months — the model is ready to scale without structural changes."
+		displayFolder: 10 Narrativa P5 Conclusao
+		lineageTag: 3eb6ec68-9e36-48ca-9550-f08890a5f61f
+
+	measure 'Narr P1 HTML' = ```
+			
+			VAR TitleText = "Dynamic Insights"
+			VAR FontSize = 15
+			VAR Spacing = 16
+			VAR ShowBullet = TRUE
+			VAR TextColor = "#D1D5DB"
+			VAR AccentColor = "#E0AE55"
+			VAR BadgeBg = "rgba(224, 174, 85, 0.18)"
+			VAR TitleColor = "#9CA3AF"
+			
+			VAR TitleStyle = "style='color:" & TitleColor & ";font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:0 0 18px 0;'"
+			VAR PStyle = "style='color:" & TextColor & ";font-size:" & FontSize & "px;margin:0 0 " & Spacing & "px 0;line-height:1.6;display:flex;align-items:baseline;'"
+			VAR Hi = "style='color:" & AccentColor & ";background-color:" & BadgeBg & ";font-size:" & FontSize & "px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-block;margin:0 2px;'"
+			VAR Bullet = IF(ShowBullet, "<span style='color:" & AccentColor & ";font-size:" & (FontSize + 2) & "px;margin-right:10px;line-height:1;'>&#8226;</span>", "")
+			
+			RETURN
+			"<div " & TitleStyle & ">" & TitleText & "</div>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Total revenue for the period is <span " & Hi & ">" & FORMAT([Total Revenue],"R$ #,##0","en-US") & "</span>, with an average ticket of <span " & Hi & ">" & FORMAT([Average Ticket],"R$ #,##0","en-US") & "</span> per order.</span></p>" & 
+			"<p " & PStyle & ">" & Bullet & "<span>Month-over-month growth is at <span " & Hi & ">" & FORMAT([MoM (Último Mês)],"0.0%","en-US") & "</span>.</span></p>" & 
+			"<p " & PStyle & ">" & Bullet & "<span>Year-to-date revenue reaches <span " & Hi & ">" & FORMAT([Year-to-date revenue],"R$ #,##0","en-US") & "</span>.</span></p>" & 
+			"<p " & PStyle & ">" & Bullet & "<span>The portfolio reached <span " & Hi & ">" & FORMAT([% Target Achievement],"0.0%","en-US") & "</span> of the monthly target, with <span " & Hi & ">" & FORMAT([Clients Below Target Count],"0","en-US") & "</span> clients still below objective.</span></p>" & 
+			"<p " & PStyle & ">" & Bullet & "<span>The operation counts <span " & Hi & ">" & FORMAT([Active Clients],"0","en-US") & "</span> active clients and <span " & Hi & ">" & FORMAT([Order Count],"#,##0","en-US") & "</span> orders processed.</span></p>"
+			```
+		displayFolder: 06 Narrativa P1 Panorama
+		lineageTag: 236cfb12-f68b-4c2e-b9eb-6a5999d8ee23
+
+	measure 'Narr P2 HTML' =
+			VAR TitleText = "Time Trend Insights"
+			VAR FontSize = 15
+			VAR Spacing = 16
+			VAR ShowBullet = TRUE
+			VAR TextColor = "#D1D5DB"
+			VAR AccentColor = "#E0AE55"
+			VAR BadgeBg = "rgba(224, 174, 85, 0.18)"
+			VAR TitleColor = "#9CA3AF"
+			
+			VAR TitleStyle = "style='color:" & TitleColor & ";font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:0 0 18px 0;'"
+			VAR PStyle = "style='color:" & TextColor & ";font-size:" & FontSize & "px;margin:0 0 " & Spacing & "px 0;line-height:1.6;display:flex;align-items:baseline;'"
+			VAR Hi = "style='color:" & AccentColor & ";background-color:" & BadgeBg & ";font-size:" & FontSize & "px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-block;margin:0 2px;'"
+			VAR Bullet = IF(ShowBullet, "<span style='color:" & AccentColor & ";font-size:" & (FontSize + 2) & "px;margin-right:10px;line-height:1;'>&#8226;</span>", "")
+			
+			RETURN
+			"<div " & TitleStyle & ">" & TitleText & "</div>" &
+			"<p " & PStyle & ">" & Bullet & "<span>The best-performing month was <span " & Hi & ">" & [Best Month Name] & "</span>, with revenue of <span " & Hi & ">" & FORMAT([Best Month Revenue],"R$ #,##0.00","en-US") & "</span>.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>The largest month-over-month drop occurred in <span " & Hi & ">" & [Worst MoM Month Name] & "</span>, with a decline of <span " & Hi & ">" & FORMAT([Worst MoM Value],"0.0%","en-US") & "</span>.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Growth was inconsistent across the year: only <span " & Hi & ">" & FORMAT([Positive MoM Months],"0","en-US") & " of " & FORMAT([Positive MoM Months] + [Negative MoM Months],"0","en-US") & "</span> comparable months showed growth, declines outnumbering gains <span " & Hi & ">" & FORMAT([Negative MoM Months],"0","en-US") & " to " & FORMAT([Positive MoM Months],"0","en-US") & "</span>.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Year-to-date revenue represents <span " & Hi & ">" & FORMAT([Year-to-date revenue],"R$ #,##0.00","en-US") & "</span> — use the controls alongside to switch between absolute and percentage views.</span></p>"
+		displayFolder: 07 Narrativa P2 Evolucao
+		lineageTag: 92abc91a-d82c-47cc-9a4d-773a3afc1d6e
+
+	measure 'Narr P3 HTML' =
+			VAR TitleText = "Portfolio Insights"
+			VAR FontSize = 15
+			VAR Spacing = 16
+			VAR ShowBullet = TRUE
+			VAR TextColor = "#D1D5DB"
+			VAR AccentColor = "#E0AE55"
+			VAR BadgeBg = "rgba(224, 174, 85, 0.18)"
+			VAR TitleColor = "#9CA3AF"
+			
+			VAR TitleStyle = "style='color:" & TitleColor & ";font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:0 0 18px 0;'"
+			VAR PStyle = "style='color:" & TextColor & ";font-size:" & FontSize & "px;margin:0 0 " & Spacing & "px 0;line-height:1.6;display:flex;align-items:baseline;'"
+			VAR Hi = "style='color:" & AccentColor & ";background-color:" & BadgeBg & ";font-size:" & FontSize & "px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-block;margin:0 2px;'"
+			VAR Bullet = IF(ShowBullet, "<span style='color:" & AccentColor & ";font-size:" & (FontSize + 2) & "px;margin-right:10px;line-height:1;'>&#8226;</span>", "")
+			
+			RETURN
+			"<div " & TitleStyle & ">" & TitleText & "</div>" &
+			"<p " & PStyle & ">" & Bullet & "<span>The <span " & Hi & ">" & [Leading Product Category] & "</span> category leads portfolio revenue.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Beyond Beer's growth is really a NAB story: non-alcoholic alone represents <span " & Hi & ">" & FORMAT([NAB Share %],"0.0%","en-US") & "</span> of revenue exposure, while liquor and soda combined stay under <span " & Hi & ">" & FORMAT([Liquor Soda Share %],"0.0%","en-US") & "</span>.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Beyond Beer categories account for <span " & Hi & ">" & FORMAT([% Beyond Beer Share],"0.0%","en-US") & "</span> of revenue — the BEES strategic diversification frontier.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>The top-earning SKU is product <span " & Hi & ">" & FORMAT([Top Product ID],"0","en-US") & "</span>, featured in the period's Top 5.</span></p>"
+		displayFolder: 08 Narrativa P3 Portfolio
+		lineageTag: c66d8d62-5d08-4791-b195-1f1c3dcf6509
+
+	measure 'Narr P4 HTML' =
+			VAR TitleText = "Customer Insights"
+			VAR FontSize = 15
+			VAR Spacing = 16
+			VAR ShowBullet = TRUE
+			VAR TextColor = "#D1D5DB"
+			VAR AccentColor = "#E0AE55"
+			VAR BadgeBg = "rgba(224, 174, 85, 0.18)"
+			VAR TitleColor = "#9CA3AF"
+			
+			VAR TitleStyle = "style='color:" & TitleColor & ";font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:0 0 18px 0;'"
+			VAR PStyle = "style='color:" & TextColor & ";font-size:" & FontSize & "px;margin:0 0 " & Spacing & "px 0;line-height:1.6;display:flex;align-items:baseline;'"
+			VAR Hi = "style='color:" & AccentColor & ";background-color:" & BadgeBg & ";font-size:" & FontSize & "px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-block;margin:0 2px;'"
+			VAR Bullet = IF(ShowBullet, "<span style='color:" & AccentColor & ";font-size:" & (FontSize + 2) & "px;margin-right:10px;line-height:1;'>&#8226;</span>", "")
+			
+			RETURN
+			"<div " & TitleStyle & ">" & TitleText & "</div>" &
+			"<p " & PStyle & ">" & Bullet & "<span>The <span " & Hi & ">" & [Leading Client Category] & "</span> segment generates the most revenue in the portfolio.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>The city with the highest revenue is <span " & Hi & ">" & [Leading City] & "</span>.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span><span " & Hi & ">" & [Leading City] & "</span>'s lead is driven largely by a single client: its top account alone represents <span " & Hi & ">" & FORMAT([Leading City Top Client Share %],"0.0%","en-US") & "</span> of the city's total revenue.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span><span " & Hi & ">" & FORMAT([Clients Below Target Count],"0","en-US") & "</span> clients are below 100% of their monthly target — a direct commercial action opportunity via BEES.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>The portfolio's average ticket is <span " & Hi & ">" & FORMAT([Average Ticket],"R$ #,##0.00","en-US") & "</span> per order.</span></p>"
+		displayFolder: 09 Narrativa P4 Carteira
+		lineageTag: 7cabdf5e-980b-462f-9860-b59a3f19dfc0
+
+	measure 'Narr P5 HTML' =
+			VAR FontSize = 15
+			VAR Spacing = 16
+			VAR ShowBullet = TRUE
+			VAR TextColor = "#D1D5DB"
+			VAR AccentColor = "#E0AE55"
+			VAR BadgeBg = "rgba(224, 174, 85, 0.18)"
+			VAR TitleColor = "#9CA3AF"
+			VAR PStyle = "style='color:" & TextColor & ";font-size:" & FontSize & "px;margin:0 0 " & Spacing & "px 0;line-height:1.6;display:flex;align-items:baseline;'"
+			VAR Hi = "style='color:" & AccentColor & ";background-color:" & BadgeBg & ";font-size:" & FontSize & "px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-block;margin:0 2px;'"
+			VAR TitleStyle = "style='color:" & TitleColor & ";font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:24px 0 18px 0;'"
+			VAR TitleStyleFirst = "style='color:" & TitleColor & ";font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:0 0 18px 0;'"
+			VAR Bullet = IF(ShowBullet, "<span style='color:" & AccentColor & ";font-size:" & (FontSize + 2) & "px;margin-right:10px;line-height:1;'>&#8226;</span>", "")
+			RETURN
+			"<div " & TitleStyleFirst & ">Key Findings</div>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Revenue is highly concentrated: the top 2 clients account for <span " & Hi & ">" & FORMAT([Top 2 Clients Share],"0.0%","en-US") & "</span> of total revenue — the portfolio depends on very few accounts.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Beer dominates the portfolio; Beyond Beer reaches <span " & Hi & ">" & FORMAT([% Beyond Beer Share],"0.0%","en-US") & "</span> of revenue exposure, yet no product from these categories reaches the Top 5.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Performance is volatile month to month: the strongest month was <span " & Hi & ">" & [Best Month Name] & "</span> (<span " & Hi & ">" & FORMAT([Best Month Revenue],"R$ #,##0","en-US") & "</span>), while the sharpest drop was <span " & Hi & ">" & [Worst MoM Month Name] & "</span> (<span " & Hi & ">" & FORMAT([Worst MoM Value],"0.0%","en-US") & "</span>).</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Only <span " & Hi & ">" & FORMAT([Clients On Target Count],"0","en-US") & " of " & FORMAT([Active Clients],"0","en-US") & "</span> clients are meeting their monthly target, leaving a combined gap of <span " & Hi & ">" & FORMAT([Target Gap Amount],"R$ #,##0","en-US") & "</span> to close.</span></p>" &
+			"<div " & TitleStyle & ">Recommendations</div>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Prioritize clients closest to their target first — the fastest path to closing the <span " & Hi & ">" & FORMAT([Target Gap Amount],"R$ #,##0","en-US") & "</span> gap is converting near-misses, not chasing the furthest accounts.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Reduce dependency on the top 2 accounts by developing the next tier through BEES — losing either one would remove close to <span " & Hi & ">" & FORMAT([Top 2 Clients Share],"0%","en-US") & "</span> of revenue overnight.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Test Beyond Beer bundling with the highest-ticket clients to grow basket size without acquiring new accounts — the category is already present in a third of order value, just not concentrated in single high-ticket SKUs.</span></p>" &
+			"<div " & TitleStyle & ">Future Research Opportunities</div>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Item-level pricing and quantity data would allow a true market basket analysis and a revenue split by SKU without the order-level duplication caveat noted below.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Cost and margin (COGS) data would validate whether Beyond Beer actually carries a better margin than beer — the core assumption behind the diversification strategy.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Multi-year history would separate real seasonality from single-year noise and enable a genuine year-over-year comparison.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Local market potential data per client would explain why monthly targets range so widely across the portfolio, and whether they are calibrated correctly.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>A product category × client segment cross-analysis would show which channels drive Beyond Beer adoption — worth revisiting once the client base is large enough to support that granularity without sparse, unreliable cells.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Validate whether the <span " & Hi & ">" & FORMAT([Top 2 Clients Share],"0.0%","en-US") & "</span> concentration in 2 clients holds as the portfolio grows, or whether it is an artifact of this small sample.</span></p>" &
+			"<div " & TitleStyle & ">Methodology &amp; Scope</div>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Data audit: a naive sum of revenue would reach <span " & Hi & ">" & FORMAT([Raw Revenue No Dedup],"R$ #,##0.00","en-US") & "</span>, corrected to <span " & Hi & ">" & FORMAT([Total Revenue],"R$ #,##0.00","en-US") & "</span> via order-level deduplication — every number above reflects this correction.</span></p>" &
+			"<p " & PStyle & ">" & Bullet & "<span>Scale note: this reading is based on <span " & Hi & ">" & FORMAT([Active Clients],"0","en-US") & "</span> clients and <span " & Hi & ">" & FORMAT([Order Count],"#,##0","en-US") & "</span> orders across <span " & Hi & ">" & FORMAT([Months In Context],"0","en-US") & "</span> months — enough for a strategic read, and the model is ready to scale without structural changes.</span></p>"
+		displayFolder: 10 Narrativa P5 Conclusao
+		lineageTag: 0e21d005-f7dc-4c31-ab93-4d19e3bfcf39
+
+	measure Velocimetro = ```
+			VAR vValor = [% Target Achievement]
+			
+			
+			VAR vValor_formatado = FORMAT( vValor, "0%" ) 
+			
+			
+			
+			VAR vFator = -- Valor de rotação necessário para que o ponteiro saia do ponto ZERO e alcance o ponto CEM.
+			    186
+			
+			VAR vRotacionar = 
+			     ROUND( vValor * vFator , 0 ) 
+			
+			
+			VAR vLimite_maximo =  -- Valor limite para evitar que o ponteiro ultrapasse o ponto máximo.
+			    262 
+			
+			VAR vRotacionar_ajustado = 
+			    IF( 
+			        vRotacionar <= vLimite_maximo, 
+			        vRotacionar, 
+			        vLimite_maximo 
+			    ) 
+			
+			
+			
+			---------------------------------------------
+			-- FORMATAÇÕES 
+			---------------------------------------------
+			
+			VAR vFonte = "Cambria"
+			
+			VAR vRot_categoria = "Target %"
+			
+			VAR vRotulo_dados_tam = 30
+			VAR vRotulo_dados_cor = [Meta Cor] 
+			
+			VAR vCor_seta = vRotulo_dados_cor 
+			
+			VAR vMarcador_comum_cor  = "#9A9FA4" 
+			
+			VAR vMarcador_max_cor  = vRotulo_dados_cor 
+			
+			VAR vNumeros_cor = "#9A9FA4"
+			
+			------------------------------------------
+			
+			VAR vPrefixo = "data:image/svg+xml, "
+			
+			RETURN 
+			
+			"
+			<svg  viewBox='0 0 250 200' fill='none' xmlns='http://www.w3.org/2000/svg'>
+			
+			        <defs>
+			
+			            <style>
+			                #ponteiro {
+			
+			                    transform: rotate(" & vRotacionar_ajustado & "deg);
+			                    transform-origin: center;
+			                    transform-box: fill-box;
+			
+			                    animation: anima_ponteiro .7s linear forwards
+			                }
+			
+			                @keyframes anima_ponteiro {
+			
+			                    from{ transform: rotate(0) }
+			
+			                    to { transform: rotate(" & vRotacionar_ajustado & "deg) }
+			
+			                }
+			
+			
+			       
+			            </style> 
+			
+			        </defs>
+				
+				
+					<g id='marcadores'>
+						<path id='marcador' fill-rule='evenodd' clip-rule='evenodd' d='M128.452 22.0096L127.904 22L127.745 31.131L128.293 31.1406L128.452 22.0096ZM123.671 22.0219L123.123 22.041L123.442 31.1679L123.989 31.1488L123.671 22.0219ZM118.897 22.2858L118.351 22.3335L119.147 31.4312L119.693 31.3835L118.897 22.2858ZM113.601 22.874L114.143 22.7977L115.414 31.8413L114.872 31.9175L113.601 22.874ZM109.423 23.5596L108.885 23.6642L110.628 32.6288L111.165 32.5242L109.423 23.5596ZM104.217 24.6987L104.749 24.5661L106.958 33.4273L106.426 33.5599L104.217 24.6987ZM100.134 25.8156L99.6099 25.9758L102.28 34.7092L102.804 34.549L100.134 25.8156ZM95.0758 27.4937L95.5907 27.3063L98.7141 35.888L98.1992 36.0754L95.0758 27.4937ZM91.1314 29.0312L90.6271 29.2453L94.1954 37.6517L94.6998 37.4376L91.1314 29.0312ZM86.2767 31.2287L86.7692 30.9885L90.7725 39.1967L90.2801 39.4369L86.2767 31.2287ZM82.5148 33.1713L82.0355 33.4369L86.463 41.4243L86.9423 41.1587L82.5148 33.1713ZM77.9159 35.8627L78.3806 35.5724L83.22 43.3171L82.7554 43.6075L77.9159 35.8627ZM74.378 38.1883L73.9292 38.5026L79.1673 45.9834L79.6162 45.6691L74.378 38.1883ZM70.0856 41.3457L70.5174 41.0084L76.1398 48.2048L75.708 48.5422L70.0856 41.3457ZM66.8098 44.0274L66.3963 44.3869L72.3877 51.2792L72.8012 50.9198L66.8098 44.0274ZM62.8713 47.6172L63.2654 47.2365L69.6093 53.8058L69.2152 54.1865L62.8713 47.6172ZM59.8939 50.6268L59.5202 51.0275L66.1992 57.2558L66.5729 56.8551L59.8939 50.6268ZM56.3522 54.6074L56.7044 54.1876L63.7002 60.0578L63.348 60.4776L56.3522 54.6074ZM53.7054 57.9119L53.3757 58.3495L60.6691 63.8456L60.9989 63.4079L53.7054 57.9119ZM50.5994 62.2433L50.9058 61.789L58.4769 66.8958L58.1705 67.3501L50.5994 62.2433ZM48.3126 65.8047L48.0304 66.2744L55.8584 70.9779L56.1406 70.5083L48.3126 65.8047ZM45.676 70.4357L45.9332 69.9519L53.9967 74.2393L53.7394 74.7231L45.676 70.4357ZM43.7743 74.2181L43.5427 74.7148L51.8195 78.5743L52.051 78.0777L43.7743 74.2181ZM41.6362 79.099L41.8414 78.591L50.3089 82.012L50.1036 82.5201L41.6362 79.099ZM40.1399 83.0597L39.9615 83.5778L48.5964 86.5511L48.7748 86.033L40.1399 83.0597ZM38.5239 88.1387L38.6749 87.612L47.4536 90.1292L47.3025 90.6559L38.5239 88.1387ZM37.4503 92.2334L37.327 92.7673L46.2254 94.8217L46.3486 94.2878L37.4503 92.2334ZM36.3737 97.4513L36.4688 96.9117L45.4625 98.4975L45.3673 99.0371L36.3737 97.4513ZM35.7339 101.636L35.6671 102.18L44.7314 103.293L44.7982 102.749L35.7339 101.636ZM35.2087 106.94L35.2469 106.394L44.3571 107.031L44.3189 107.577L35.2087 106.94ZM35.0096 111.169L35 111.717L44.131 111.876L44.1406 111.329L35.0096 111.169ZM35.0419 116.497L35.0228 115.95L44.1497 115.631L44.1688 116.179L35.0419 116.497ZM35.286 120.725L35.3338 121.27L44.4314 120.475L44.3837 119.929L35.286 120.725ZM35.8751 126.02L35.7989 125.478L44.8424 124.207L44.9187 124.749L35.8751 126.02ZM36.5596 130.199L36.6642 130.736L45.6288 128.994L45.5242 128.456L36.5596 130.199ZM37.6989 135.404L37.5664 134.873L46.4275 132.663L46.5601 133.195L37.6989 135.404ZM38.8165 139.488L38.9767 140.012L47.7101 137.342L47.5499 136.817L38.8165 139.488ZM40.4937 144.546L40.3063 144.031L48.888 140.907L49.0754 141.422L40.4937 144.546ZM42.0319 148.49L42.246 148.994L50.6524 145.426L50.4383 144.921L42.0319 148.49ZM44.229 153.345L43.9888 152.852L52.1969 148.849L52.4371 149.341L44.229 153.345ZM46.1708 157.105L46.4365 157.584L54.4239 153.157L54.1582 152.678L46.1708 157.105ZM48.8632 161.705L48.5728 161.24L56.3175 156.401L56.6079 156.865L48.8632 161.705ZM51.1878 165.242L51.5021 165.691L58.983 160.453L58.6687 160.004L51.1878 165.242ZM54.346 169.535L54.0086 169.103L61.2051 163.481L61.5424 163.912L54.346 169.535ZM49.8379 178.537L50.1974 178.951L63.982 166.968L63.6225 166.555L49.8379 178.537ZM198.275 57.0849L198.612 57.5167L191.416 63.1392L191.078 62.7074L198.275 57.0849ZM195.593 53.8098L195.234 53.3963L188.341 59.3877L188.701 59.8012L195.593 53.8098ZM192.004 49.8717L192.384 50.2659L185.815 56.6098L185.434 56.2156L192.004 49.8717ZM188.994 46.8939L188.593 46.5202L182.365 53.1992L182.766 53.5729L188.994 46.8939ZM185.012 43.3524L185.432 43.7046L179.562 50.7004L179.142 50.3482L185.012 43.3524ZM181.708 40.7052L181.271 40.3754L175.775 47.6689L176.212 47.9987L181.708 40.7052ZM177.378 37.5982L177.833 37.9047L172.726 45.4758L172.272 45.1694L177.378 37.5982ZM173.816 35.312L173.346 35.0298L168.642 42.8578L169.112 43.14L173.816 35.312ZM169.185 32.6753L169.668 32.9325L165.381 40.996L164.897 40.7387L169.185 32.6753ZM165.402 30.7736L164.906 30.542L161.046 38.8188L161.543 39.0504L165.402 30.7736ZM160.521 28.6353L161.029 28.8405L157.608 37.308L157.1 37.1027L160.521 28.6353ZM156.561 27.1406L156.043 26.9622L153.07 35.5971L153.588 35.7755L156.561 27.1406ZM151.483 25.5245L152.009 25.6756L149.492 34.4542L148.965 34.3032L151.483 25.5245ZM147.388 24.4492L146.854 24.3259L144.8 33.2243L145.333 33.3475L147.388 24.4492ZM142.169 23.3734L142.708 23.4686L141.123 32.4623L140.583 32.3671L142.169 23.3734ZM137.984 22.7339L137.44 22.6671L136.327 31.7314L136.871 31.7982L137.984 22.7339ZM132.681 22.2087L133.228 22.2469L132.591 31.3571L132.044 31.3189L132.681 22.2087Z' fill='" &vMarcador_comum_cor & "'/>
+			
+						<path id='marcador_maximo' fill-rule='evenodd' clip-rule='evenodd' d='M209.638 56.8979L208.852 55.7758L193.891 66.252L194.676 67.3742L209.638 56.8979ZM203.758 64.9153L204.484 66.077L196.739 70.9165L196.013 69.7548L203.758 64.9153ZM206.848 70.2337L206.184 69.0356L198.197 73.4631L198.861 74.6612L206.848 70.2337ZM208.392 73.2754L208.993 74.5066L200.784 78.51L200.184 77.2788L208.392 73.2754ZM210.91 78.8885L210.375 77.6276L201.969 81.1959L202.504 82.4569L210.91 78.8885ZM212.127 82.0761L212.596 83.3633L204.014 86.4868L203.546 85.1995L212.127 82.0761ZM214.045 87.9202L213.644 86.6102L204.911 89.2802L205.311 90.5902L214.045 87.9202ZM214.922 91.2174L215.253 92.5466L206.392 94.7559L206.061 93.4267L214.922 91.2174ZM216.218 97.23L215.957 95.8853L206.992 97.6278L207.254 98.9725L216.218 97.23ZM216.746 100.6L216.937 101.956L207.893 103.227L207.702 101.871L216.746 100.6ZM217.407 106.716L217.287 105.351L208.19 106.147L208.309 107.512L217.407 106.716ZM217.579 110.123L217.627 111.492L208.5 111.81L208.452 110.441L217.579 110.123ZM217.597 116.274L217.621 114.905L208.49 114.745L208.466 116.115L217.597 116.274ZM217.412 119.681L217.317 121.048L208.206 120.411L208.302 119.044L217.412 119.681ZM216.787 125.8L216.954 124.44L207.89 123.327L207.723 124.687L216.787 125.8ZM216.247 129.169L216.009 130.518L207.016 128.932L207.253 127.583L216.247 129.169ZM214.986 135.189L215.294 133.854L206.396 131.8L206.087 133.135L214.986 135.189ZM214.097 138.483L213.719 139.8L204.941 137.283L205.318 135.966L214.097 138.483ZM212.213 144.337L212.659 143.042L204.024 140.069L203.578 141.364L212.213 144.337ZM210.985 147.521L210.472 148.791L202.004 145.37L202.517 144.1L210.985 147.521ZM208.499 153.147L209.078 151.905L200.802 148.046L200.223 149.287L208.499 153.147ZM206.945 156.184L206.302 157.394L198.239 153.106L198.882 151.897L206.945 156.184ZM203.885 161.52L204.591 160.346L196.763 155.642L196.057 156.816L203.885 161.52ZM202.022 164.378L201.256 165.514L193.685 160.407L194.451 159.272L202.022 164.378ZM198.421 169.364L199.245 168.27L191.952 162.774L191.127 163.868L198.421 169.364ZM201.788 179.406L202.696 178.38L189.016 166.278L188.109 167.304L201.788 179.406Z' fill='" & vMarcador_max_cor & "'/>
+					</g>
+					<g id='ponteiro'>
+						<circle id='circ_giro' cx='126.5' cy='113.499' r='91.5' fill='#0000' fill-opacity='0.24'/>
+						<path id='seta' d='M63.7784 163.683C63.1195 163.739 62.6213 163.098 62.8382 162.474L70.4118 140.66C70.9396 139.14 73.0417 138.988 73.7927 140.412C75.6091 143.854 78.1977 148.622 79.4077 150.204C80.6502 151.829 84.5948 155.875 87.3372 158.64C88.4344 159.747 87.7435 161.641 86.1908 161.773L63.7784 163.683Z' fill='" & vCor_seta & "'/>
+					</g>
+			
+					<g id='numeros'>
+						<text id='0' fill='" & vNumeros_cor & "'  font-family='" & vFonte & "' font-size='15.015' font-weight='600' >
+							<tspan x='34' y='188.383'>0</tspan>
+						</text>
+						<text id='20' fill='" & vNumeros_cor & "'  font-family='" & vFonte & "' font-size='15.015' font-weight='600' >
+							<tspan x='12' y='126.383'>20</tspan>
+						</text>
+						<text id='40' fill='" & vNumeros_cor & "'  font-family='" & vFonte & "' font-size='15.015' font-weight='600' >
+							<tspan x='26' y='62.3829'>40</tspan>
+						</text>
+						<text id='60' fill='" & vNumeros_cor & "'  font-family='" & vFonte & "' font-size='15.015' font-weight='600' >
+							<tspan x='81' y='21.3829'>60</tspan>
+						</text>
+						<text id='80' fill='" & vNumeros_cor & "'  font-family='" & vFonte & "' font-size='15.015' font-weight='600' >
+							<tspan x='150' y='19.3829'>80</tspan>
+						</text>
+						<text id='100' fill='" & vNumeros_cor & "'  font-family='" & vFonte & "' font-size='15.015' font-weight='600' >
+							<tspan x='211' y='57.3829'>100</tspan>
+						</text>
+						<text id='MAX' fill='" & vMarcador_max_cor & "'  font-family='" & vFonte & "' font-size='15.015' font-weight='600' >
+							<tspan x='205' y='188.383'>MAX</tspan>
+						</text>
+					</g>
+			
+					<text id='rot_dados' fill='" & vRotulo_dados_cor & "'  font-family='" & vFonte & "' font-size='" & vRotulo_dados_tam & "' font-weight='600' text-anchor='middle' >
+						<tspan x='125' y='129.255'> " & vValor_formatado & "</tspan>
+					</text>
+					<text id='rot_catgoria' fill='" & vMarcador_comum_cor & "'  font-family='" & vFonte & "' font-size='13' font-weight='600' text-anchor='middle' >
+						<tspan x='125' y='95.6605'> " & vRot_categoria & "</tspan>
+					</text>
+			
+			        <path id='contorno_interno' d='M162.459 162.154C172.619 154.645 180.174 144.143 184.063 132.123C187.952 120.102 187.98 107.165 184.143 95.1275C180.306 83.09 172.797 72.5556 162.669 65.0024C152.542 57.4491 140.303 53.256 127.672 53.0113C115.04 52.7667 102.648 56.4827 92.2357 63.6381C81.8231 70.7935 73.9118 81.0292 69.6118 92.9091C65.3118 104.789 64.8389 117.717 68.2594 129.879C71.6799 142.042 78.8222 152.828 88.6842 160.725L89.5723 159.616C79.9419 151.905 72.9673 141.372 69.6272 129.495C66.287 117.618 66.7488 104.994 70.9478 93.3927C75.1468 81.7917 82.8723 71.7964 93.0404 64.8091C103.208 57.8217 115.309 54.1929 127.644 54.4319C139.979 54.6708 151.93 58.7654 161.82 66.1413C171.71 73.5172 179.043 83.8042 182.789 95.559C186.536 107.314 186.508 119.947 182.711 131.685C178.913 143.424 171.536 153.679 161.614 161.012L162.459 162.154Z' fill='" & vRotulo_dados_cor & "'/>
+			
+			
+			</svg>
+			"
+			```
+		displayFolder: 11 Velocimetro
+		lineageTag: 24db1b22-e1cb-403b-be71-8e29e9ae7e66
+
+	measure 'Meta Cor' =
+			VAR v = [% Target Achievement]
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    ISBLANK(v), "#9A9FA4",
+			    v < 0.5, "#E2685A",
+			    v < 1, "#F2A73B",
+			    "#5FBE86"
+			)
+		displayFolder: 11 Velocimetro
+		lineageTag: 54b73fe0-3b72-4239-ad7e-5b8931e20fc3
+
+	/// Use no Colors > fx > Format by field value do gráfico de barras/colunas mensal (Total Revenue por mes). Pinta em destaque a barra do mes com maior faturamento dentro do que estiver filtrado; o resto fica cinza neutro.
+	measure 'Best Month Bar Color' =
+			VAR MonthRank =
+			    RANKX(
+			        ALL(D_Calendar[Month Year]),
+			        CALCULATE([Total Revenue]),
+			        ,
+			        DESC
+			    )
+			RETURN
+			    IF(MonthRank = 1, "#E0AE55", "#3A4250")
+		displayFolder: 12 Chart Formatting
+		lineageTag: c2c39deb-ca12-4058-a6f8-62e5c8ac0947
+
+	/// Subrotulo de detalhe para o grafico de colunas mensal (Total Revenue por mes). Mostra a variacao MoM daquele mes com sinal explicito. Usar em Formatar visual > Rotulos de dados > Rotulos de detalhe.
+	measure 'MoM Label Text' =
+			VAR v = [Month-over-month growth (%)]
+			RETURN
+			    IF(ISBLANK(v), BLANK(), FORMAT(v, "+0.0%;-0.0%", "en-US"))
+		displayFolder: 12 Chart Formatting
+		lineageTag: aa37be83-a905-40b5-b69b-170e2a4eb330
+
+	/// Cor condicional para o subrotulo MoM Label Text: verde se crescimento, vermelho se queda, cinza se em branco.
+	measure 'MoM Label Color' =
+			VAR v = [Month-over-month growth (%)]
+			RETURN
+			    IF(ISBLANK(v), "#9A9FA4", IF(v >= 0, "#5FBE86", "#E2685A"))
+		displayFolder: 12 Chart Formatting
+		lineageTag: 6f1012f6-a09c-4d0d-9d7a-865102f2e1fa
+
+	/// Titulo customizado do card de Total Revenue: variacao MoM com seta, adaptado do padrao YoY do usuario (nao ha ano anterior nos dados, usamos MoM).
+	measure 'Total Revenue Card Title' =
+			VAR vPercMoM = [MoM (Último Mês)]
+			RETURN
+			    FORMAT(vPercMoM + 0, "⮝ +0.0% vs Previous Month; ⮟ -0.0% vs Previous Month; no change", "en-US")
+		displayFolder: 13 Card Titles
+		lineageTag: 594b42c7-32db-4aa6-96c2-4ca608335417
+
+	/// Subtitulo customizado: mes com maior faturamento no periodo, mesmo padrao TOPN + ALL multi-coluna do usuario.
+	measure 'Total Revenue Card Subtitle' =
+			VAR BestMonthTable =
+			    TOPN(
+			        1,
+			        ALL(D_Calendar[Month Abbrev], D_Calendar[Month Name], D_Calendar[Month Number]),
+			        [Total Revenue],
+			        DESC
+			    )
+			VAR BestMonthScalar = MAXX(BestMonthTable, D_Calendar[Month Abbrev])
+			RETURN
+			    "(" & BestMonthScalar & ") best month"
+		displayFolder: 13 Card Titles
+		lineageTag: ee772072-7724-4fc9-8da7-4f87d80e4e5a
+
+	/// Cor condicional do titulo: verde se MoM positivo, vermelho se negativo, cinza se sem variacao.
+	measure 'Total Revenue Card Title Color' =
+			VAR vPercMoM = [MoM (Último Mês)]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        vPercMoM > 0, "#5FBE86",
+			        vPercMoM < 0, "#E2685A",
+			        "#9A9FA4"
+			    )
+		displayFolder: 13 Card Titles
+		lineageTag: 3c523df0-176b-485b-b469-e487fbba1019
+
+	measure 'Average Ticket MoM %' =
+			VAR CurrentVal = [Average Ticket]
+			VAR PreviousVal = CALCULATE([Average Ticket], DATEADD(D_Calendar[Date], -1, MONTH))
+			RETURN DIVIDE(CurrentVal - PreviousVal, PreviousVal, BLANK())
+		isHidden
+		displayFolder: 13 Card Titles
+		lineageTag: a1c90d57-9598-4e4a-ae26-2a4403ed00d8
+
+	measure 'Average Ticket MoM (Last Month)' =
+			IF(
+			    HASONEVALUE(D_Calendar[Year Month Number]),
+			    [Average Ticket MoM %],
+			    VAR LastMonthInContext = CALCULATE(MAX(D_Calendar[Year Month Number]), ALLSELECTED(D_Calendar))
+			    RETURN CALCULATE([Average Ticket MoM %], D_Calendar[Year Month Number] = LastMonthInContext)
+			)
+		isHidden
+		displayFolder: 13 Card Titles
+		lineageTag: eb55e52e-a538-4edf-adf6-2322a46f2f08
+
+	measure 'Average Ticket Card Title' =
+			VAR v = [Average Ticket MoM (Last Month)]
+			RETURN FORMAT(v + 0, "⮝ +0.0% vs Previous Month; ⮟ -0.0% vs Previous Month; no change", "en-US")
+		displayFolder: 13 Card Titles
+		lineageTag: cae8cd17-9e75-418f-acaa-5e230282fe9f
+
+	measure 'Average Ticket Card Title Color' =
+			VAR v = [Average Ticket MoM (Last Month)]
+			RETURN SWITCH(TRUE(), v > 0, "#5FBE86", v < 0, "#E2685A", "#9A9FA4")
+		displayFolder: 13 Card Titles
+		lineageTag: 79ad977e-4168-42e6-b1d3-957754c6097d
+
+	measure 'Average Ticket Card Subtitle' =
+			VAR BestTable =
+			    TOPN(
+			        1,
+			        ALL(D_Calendar[Month Abbrev], D_Calendar[Month Name], D_Calendar[Month Number]),
+			        [Average Ticket],
+			        DESC
+			    )
+			VAR BestScalar = MAXX(BestTable, D_Calendar[Month Abbrev])
+			RETURN "(" & BestScalar & ") highest ticket"
+		displayFolder: 13 Card Titles
+		lineageTag: 92f6ed8a-170c-4142-a9e5-f16af6b535a8
+
+	measure 'YTD Last Month Share %' =
+			VAR LastMonthNum = CALCULATE(MAX(D_Calendar[Year Month Number]), ALLSELECTED(D_Calendar))
+			VAR LastMonthRevenue = CALCULATE([Total Revenue], D_Calendar[Year Month Number] = LastMonthNum)
+			VAR YTD = [Year-to-date revenue]
+			RETURN DIVIDE(LastMonthRevenue, YTD, BLANK())
+		isHidden
+		displayFolder: 13 Card Titles
+		lineageTag: 538acc09-7e5b-4299-961b-c3f6ad4128ec
+
+	measure 'YTD Card Title' =
+			VAR v = [YTD Last Month Share %]
+			RETURN FORMAT(v, "0.0%", "en-US") & " from last month alone"
+		displayFolder: 13 Card Titles
+		lineageTag: 85c97094-83f0-4d7b-8b25-ffc1a8ad6fcb
+
+	measure 'YTD Card Title Color' =
+			VAR v = [YTD Last Month Share %]
+			RETURN SWITCH(TRUE(), v >= 0.5, "#E2685A", v >= 0.3, "#F2A73B", "#5FBE86")
+		displayFolder: 13 Card Titles
+		lineageTag: fcc52c84-67be-4ee1-9479-2955c63bde3e
+
+	measure 'YTD Card Subtitle' = "(" & FORMAT([Months In Context], "0") & " months tracked)"
+		displayFolder: 13 Card Titles
+		lineageTag: 13ab1ae5-78a3-435d-beb2-ad8c886fe331
+
+	measure 'Clients On Target Count' = [Active Clients] - [Clients Below Target Count]
+		isHidden
+		displayFolder: 13 Card Titles
+		lineageTag: 44703cdd-c04c-4fcc-873f-d7ac23646699
+
+	measure 'Target Achievement Card Title' = FORMAT([Clients On Target Count], "0") & " of " & FORMAT([Active Clients], "0") & " clients on target"
+		displayFolder: 13 Card Titles
+		lineageTag: c2b9f7b1-e9eb-40ab-b6fe-b305be9fe6f2
+
+	measure 'Target Achievement Card Title Color' =
+			VAR OnTarget = [Clients On Target Count]
+			RETURN SWITCH(TRUE(), OnTarget = [Active Clients], "#5FBE86", OnTarget = 0, "#E2685A", "#F2A73B")
+		displayFolder: 13 Card Titles
+		lineageTag: 92f5fcf1-4aa2-4d11-9a61-b39006e2d00f
+
+	measure 'Target Achievement Card Subtitle' =
+			VAR Gap = MAX([Total Period Target] - [Total Revenue], 0)
+			RETURN "(" & FORMAT(Gap, "R$ #,##0", "en-US") & " to close gap)"
+		displayFolder: 13 Card Titles
+		lineageTag: 2c05f54b-2c3a-460c-aae9-75c1ab06adda
+
+	measure 'Average MoM %' =
+			VAR MonthsTable = ADDCOLUMNS(SUMMARIZE(ALL(D_Calendar), D_Calendar[Year Month]), "@MoM", CALCULATE([Month-over-month growth (%)]))
+			VAR Filtered = FILTER(MonthsTable, NOT ISBLANK([@MoM]))
+			RETURN AVERAGEX(Filtered, [@MoM])
+		isHidden
+		displayFolder: 13 Card Titles
+		lineageTag: 80a9dd66-ae1b-4294-89c2-a22476e07711
+
+	measure 'MoM Card Title' =
+			VAR CurrentMoM = [MoM (Último Mês)]
+			VAR AvgMoM = [Average MoM %]
+			RETURN IF(CurrentMoM >= AvgMoM, "⮝ above average pace", "⮟ below average pace")
+		displayFolder: 13 Card Titles
+		lineageTag: 92622755-5e82-4957-89b2-830cdf59c78f
+
+	measure 'MoM Card Title Color' =
+			VAR CurrentMoM = [MoM (Último Mês)]
+			VAR AvgMoM = [Average MoM %]
+			RETURN IF(CurrentMoM >= AvgMoM, "#5FBE86", "#E2685A")
+		displayFolder: 13 Card Titles
+		lineageTag: 7f1ca63a-3437-4df2-b635-59aee551b79a
+
+	measure 'MoM Card Subtitle' = "(worst: " & [Worst MoM Month Name] & " " & FORMAT([Worst MoM Value], "0.0%", "en-US") & ")"
+		displayFolder: 13 Card Titles
+		lineageTag: e1975f79-6bfd-464b-937f-33fb7e8fc526
+
+	/// Titulo dinamico do grafico com toggle (Toggle Metrica v2). Muda conforme a opcao selecionada na segmentacao de dados ligada ao Field Parameter.
+	measure 'Toggle Chart Title' =
+			SWITCH(
+			    SELECTEDVALUE('Toggle Metrica v2'[Toggle Metrica v2 Campos]),
+			    NAMEOF('Medidas'[Total Revenue]), "Total Revenue Metric",
+			    NAMEOF('Medidas'[Month-over-month growth (%)]), "MoM Metric",
+			    "Metric"
+			)
+		displayFolder: 07 Narrativa P2 Evolucao
+		lineageTag: 6e12d1ff-8863-40d9-b148-2df7bc38f519
+
+	measure 'Target Gap Amount' = MAX([Total Period Target] - [Total Revenue], 0)
+		isHidden
+		displayFolder: 10 Narrativa P5 Conclusao
+		lineageTag: 5b394de7-c5e1-41e8-9444-a67e682b7ed6
+
+	/// Use no Colors > fx > Format by field value do grafico Top 5 products (eixo product_id). Pinta so o produto de maior receita, resto cinza.
+	measure 'Top 5 Products Bar Color' =
+			VAR ProductRank =
+			    RANKX(
+			        ALL(D_items[product_id]),
+			        CALCULATE([Total Revenue]),
+			        ,
+			        DESC
+			    )
+			RETURN
+			    IF(ProductRank = 1, "#E0AE55", "#3A4250")
+		displayFolder: 12 Chart Formatting
+		lineageTag: c8a9d642-dcab-47d0-808a-c6bd001043fb
+
+	/// Use no Colors > fx > Format by field value do grafico Total Revenue por category (eixo D_items[category]). Pinta so a categoria de maior receita, resto cinza.
+	measure 'Category Bar Color' =
+			VAR CategoryRank =
+			    RANKX(
+			        ALL(D_items[category]),
+			        CALCULATE([Total Revenue]),
+			        ,
+			        DESC
+			    )
+			RETURN
+			    IF(CategoryRank = 1, "#E0AE55", "#3A4250")
+		displayFolder: 12 Chart Formatting
+		lineageTag: 3d648fb0-6eb5-419f-aef7-f0ce4169a8ad
+
+	measure 'Positive MoM Months' =
+			VAR MonthsTable = ADDCOLUMNS(SUMMARIZE(ALL(D_Calendar), D_Calendar[Year Month]), "@MoM", CALCULATE([Month-over-month growth (%)]))
+			RETURN COUNTROWS(FILTER(MonthsTable, [@MoM] > 0))
+		isHidden
+		displayFolder: 05 Apoio Narrativa
+		lineageTag: 31fd9aa7-ef9b-433e-bae3-17e7a82c10f2
+
+	measure 'Negative MoM Months' =
+			VAR MonthsTable = ADDCOLUMNS(SUMMARIZE(ALL(D_Calendar), D_Calendar[Year Month]), "@MoM", CALCULATE([Month-over-month growth (%)]))
+			RETURN COUNTROWS(FILTER(MonthsTable, [@MoM] < 0))
+		isHidden
+		displayFolder: 05 Apoio Narrativa
+		lineageTag: 4e3f98a8-214d-4db1-908a-ecc730b74853
+
+	measure 'NAB Share %' = DIVIDE(CALCULATE([Total Revenue], D_items[category] = "nab"), [Total Revenue], BLANK())
+		isHidden
+		displayFolder: 05 Apoio Narrativa
+		lineageTag: 3ead22ad-545c-4378-83f9-86019759fe83
+
+	measure 'Liquor Soda Share %' = DIVIDE(CALCULATE([Total Revenue], D_items[category] IN {"liquor","soda"}), [Total Revenue], BLANK())
+		isHidden
+		displayFolder: 05 Apoio Narrativa
+		lineageTag: 1a7a5cf0-91fb-4304-ac6e-7e44ca26ebb0
+
+	measure 'Leading City Top Client Share %' =
+			VAR TopCity = [Leading City]
+			VAR CityRevenue = CALCULATE([Total Revenue], D_users[city] = TopCity)
+			VAR ClientsInCity = CALCULATETABLE(VALUES(D_users[user_id]), D_users[city] = TopCity)
+			VAR WithRev = ADDCOLUMNS(ClientsInCity, "@Rev", CALCULATE([Total Revenue]))
+			VAR TopClientRevenue = MAXX(WithRev, [@Rev])
+			RETURN DIVIDE(TopClientRevenue, CityRevenue, BLANK())
+		isHidden
+		displayFolder: 05 Apoio Narrativa
+		lineageTag: c766f288-a13f-487e-99b8-f75e872414f6
+
+	measure 'Narr P2 Consistency' = "Growth was inconsistent across the year: only " & FORMAT([Positive MoM Months],"0","en-US") & " of the " & FORMAT([Positive MoM Months] + [Negative MoM Months],"0","en-US") & " comparable months showed month-over-month growth, with declines outnumbering gains " & FORMAT([Negative MoM Months],"0","en-US") & " to " & FORMAT([Positive MoM Months],"0","en-US") & "."
+		displayFolder: 07 Narrativa P2 Evolucao
+		lineageTag: a310436b-0f12-444b-a7ad-7d3ddd4dfd86
+
+	measure 'Narr P3 Mix' = "Beyond Beer's growth is really a NAB story: non-alcoholic alone represents " & FORMAT([NAB Share %],"0.0%","en-US") & " of revenue exposure, while liquor and soda combined stay under " & FORMAT([Liquor Soda Share %],"0.0%","en-US") & "."
+		displayFolder: 08 Narrativa P3 Portfolio
+		lineageTag: 04df73b7-5365-484d-be35-754972cf4631
+
+	measure 'Narr P4 Geography' = "" & [Leading City] & "'s lead is driven largely by a single client: its top account alone represents " & FORMAT([Leading City Top Client Share %],"0.0%","en-US") & " of the city's total revenue."
+		displayFolder: 09 Narrativa P4 Carteira
+		lineageTag: a6538905-ff63-40e0-b36f-c87eff10712a
+
+	column ' '
+		formatString: 0
+		lineageTag: 47b5223a-09ba-4d2e-9903-2aa61640f152
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [ ]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Medidas = calculated
+		mode: import
+		source = Row(" ", BLANK())
+
+	annotation PBI_Id = 0e100a3f71f645e895aebb3bd76dbaa1
+

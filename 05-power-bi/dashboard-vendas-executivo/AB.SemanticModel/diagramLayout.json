@@ -1,0 +1,113 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 249.17966782150938,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 524.4903170146938,
+            "y": 308.25161399999973
+          },
+          "nodeIndex": "F_orders",
+          "nodeLineageTag": "de21145a-122c-4aa2-bb96-869e8d36cbed",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 935.64641701469361,
+            "y": 319.630641489961
+          },
+          "nodeIndex": "D_items",
+          "nodeLineageTag": "d740654d-f26f-4672-b24f-63d4c0eeda5b",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 116.29955819318536,
+            "y": 645.39548346988306
+          },
+          "nodeIndex": "D_targets",
+          "nodeLineageTag": "a5b28ae9-1f3d-40f4-8def-6a1104da959d",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 73.030292999999944,
+            "y": 315.81341146413604
+          },
+          "nodeIndex": "D_users",
+          "nodeLineageTag": "95966ddf-0d3a-4dfc-a61e-210b2e2e67c5",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1282.2745198215082,
+            "y": 8.6465912349417522
+          },
+          "nodeIndex": "Medidas",
+          "nodeLineageTag": "ee7ec310-c1e1-4276-a0f6-a297c6b30fdc",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1493.2442268215082,
+            "y": 334.69774173494153
+          },
+          "nodeIndex": "Toggle Metrica v2",
+          "nodeLineageTag": "aca56658-dcce-435c-a4b3-fd9ea4b0b508",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 510.62572501469413,
+            "y": 0
+          },
+          "nodeIndex": "D_Calendar",
+          "nodeLineageTag": "d8f10ef4-f31a-4d0b-a9fe-504b9308d5db",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "Todas as tabelas",
+      "zoomValue": 56.447393005377791,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Todas as tabelas",
+  "defaultDiagram": "Todas as tabelas"
+}
