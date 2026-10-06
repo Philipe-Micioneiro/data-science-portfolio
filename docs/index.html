@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Philipe Micioneiro | Data</title>
+<meta name="description" content="Matemático e analista de dados. SQL, Power BI, Python, ciência de dados e IA.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1020; --bg2:#111933; --card:#141c38; --line:#222c52;
+  --text:#e6eaf7; --muted:#97a3c7; --accent:#4fd1c5; --accent2:#7c8cff;
+}
+:root[data-theme="light"]{
+  --bg:#f6f7fb; --bg2:#ffffff; --card:#ffffff; --line:#dfe3f0;
+  --text:#141a33; --muted:#566089; --accent:#0f9d8f; --accent2:#4453d6;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;
+  background-image:radial-gradient(900px 400px at 85% -10%,rgba(124,140,255,.18),transparent),radial-gradient(700px 400px at -10% 10%,rgba(79,209,197,.12),transparent);
+  background-repeat:no-repeat}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+nav{position:sticky;top:0;z-index:5;backdrop-filter:blur(10px);background:color-mix(in srgb,var(--bg) 80%,transparent);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-family:"JetBrains Mono",monospace;font-weight:500;color:var(--accent)}
+nav ul{display:flex;gap:22px;list-style:none;font-size:.92rem;color:var(--muted)}
+nav ul a:hover{color:var(--text)}
+.tools{display:flex;gap:8px}
+.tools button{background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:6px 10px;font:500 .8rem "JetBrains Mono",monospace;cursor:pointer}
+.tools button:hover{border-color:var(--accent)}
+header.hero{padding:96px 0 72px}
+.tag{font-family:"JetBrains Mono",monospace;color:var(--accent);font-size:.9rem}
+h1{font-size:clamp(2.2rem,6vw,3.6rem);line-height:1.1;margin:14px 0 18px;letter-spacing:-.02em}
+h1 span{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{max-width:640px;color:var(--muted);font-size:1.12rem}
+.cta{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+.btn{padding:11px 18px;border-radius:10px;font-weight:600;font-size:.95rem;border:1px solid var(--line)}
+.btn.primary{background:var(--accent);color:#06201d;border-color:var(--accent)}
+.btn:hover{transform:translateY(-1px)}
+section{padding:56px 0;border-top:1px solid var(--line)}
+h2{font-size:1.5rem;margin-bottom:8px}
+h2::before{content:"// ";font-family:"JetBrains Mono",monospace;color:var(--accent)}
+.sub{color:var(--muted);margin-bottom:28px;max-width:640px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;transition:.2s}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card h3{font-size:1.05rem;margin-bottom:6px}
+.card p{color:var(--muted);font-size:.95rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{font:400 .78rem "JetBrains Mono",monospace;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.soon{display:inline-block;margin-top:12px;font:500 .75rem "JetBrains Mono",monospace;color:var(--accent2)}
+.about p{max-width:680px;color:var(--muted);margin-bottom:14px;font-size:1.04rem}
+.about p strong{color:var(--text)}
+.stack{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.stack .chip{font-size:.85rem;padding:5px 12px;color:var(--text);background:var(--card)}
+footer{border-top:1px solid var(--line);padding:32px 0;color:var(--muted);font-size:.88rem}
+.en{display:none}
+html[lang="en"] .pt{display:none}
+html[lang="en"] .en{display:revert}
+.brands{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px}.brands span{font:600 1rem Inter,sans-serif;padding:8px 16px;border:1px solid var(--line);border-radius:10px;background:var(--card)}.jobs{display:grid;gap:12px}.job{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}.jh{display:flex;justify-content:space-between;gap:12px;align-items:baseline}.when{font:400 .8rem "JetBrains Mono",monospace;color:var(--accent)}.role{color:var(--text);font-size:.95rem;margin:2px 0 6px}.job p{color:var(--muted);font-size:.92rem}
+@media(max-width:640px){nav ul{display:none}header.hero{padding:64px 0 48px}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <a class="logo" href="#top">philipe.micioneiro</a>
+  <ul>
+    <li><a href="#sobre"><span class="pt">Sobre</span><span class="en">About</span></a></li>
+    <li><a href="#experiencia"><span class="pt">Experiência</span><span class="en">Experience</span></a></li>
+    <li><a href="#areas"><span class="pt">Áreas</span><span class="en">Areas</span></a></li>
+    <li><a href="#projetos"><span class="pt">Projetos</span><span class="en">Projects</span></a></li>
+    <li><a href="#contato"><span class="pt">Contato</span><span class="en">Contact</span></a></li>
+  </ul>
+  <div class="tools"><button id="lang">EN</button><button id="theme">◐</button></div>
+</div></nav>
+
+<header class="hero" id="top"><div class="wrap">
+  <div class="tag">&gt; matemático · analista de dados</div>
+  <h1><span class="pt">Eu rastreio o número<br>que <span>não bate</span>.</span><span class="en">I chase the number<br>that <span>doesn't add up</span>.</span></h1>
+  <p class="lead pt">Matemático de formação, analista de dados por ofício. Trabalho com SQL, Power BI e Python para transformar dado bagunçado em decisão em que dá pra confiar.</p>
+  <p class="lead en">Mathematician by training, data analyst by trade. I use SQL, Power BI and Python to turn messy data into decisions you can trust.</p>
+  <div class="cta">
+    <a class="btn primary" href="https://github.com/Philipe-Micioneiro/data-science-portfolio"><span class="pt">Ver repositório</span><span class="en">View repository</span></a>
+    <a class="btn" href="mailto:micioneiro.bezerra@gmail.com"><span class="pt">Falar comigo</span><span class="en">Get in touch</span></a>
+  </div>
+</div></header>
+
+<section id="sobre" class="about"><div class="wrap">
+  <h2><span class="pt">Sobre</span><span class="en">About</span></h2>
+  <div class="pt">
+    <p>Minha formação é em <strong>matemática</strong>, e isso moldou o jeito que eu trabalho: desconfio de resultado que não consigo explicar.</p>
+    <p>O problema que mais me interessa é aquele em que <strong>dois números deveriam ser iguais e não são</strong>. Eu sigo a diferença até a linha exata que a causa, seja uma regra de negócio, uma junção duplicando registros ou um filtro que ninguém documentou, e deixo o processo mais confiável do que encontrei.</p>
+    <p>Estou construindo este portfólio do zero, com dados públicos, para mostrar o método além do resultado.</p>
+  </div>
+  <div class="en">
+    <p>I trained as a <strong>mathematician</strong>, and it shapes how I work: I distrust any result I can't explain.</p>
+    <p>The problem I enjoy most is when <strong>two numbers should match and don't</strong>. I follow the gap down to the exact line causing it, whether a business rule, a join duplicating rows or an undocumented filter, and leave the process more reliable than I found it.</p>
+    <p>I'm building this portfolio from scratch with public data, to show the method and not just the result.</p>
+  </div>
+  <div class="stack">
+    <span class="chip">SQL Server / Azure SQL</span><span class="chip">Power BI · DAX</span><span class="chip">Python</span><span class="chip">R</span><span class="chip">Streamlit</span><span class="chip">Power Automate</span><span class="chip">Machine Learning</span>
+  </div>
+</div></section>
+
+<section id="experiencia"><div class="wrap">
+  <h2><span class="pt">Experiência</span><span class="en">Experience</span></h2>
+  <p class="sub pt">Empresas com as quais já trabalhei, de supply chain a serviços financeiros.</p>
+  <p class="sub en">Companies I have worked with, from supply chain to financial services.</p>
+  <div class="brands"><span>PepsiCo</span><span>AMBEV</span><span>Bradesco</span><span>Caixa</span><span>CI&amp;T</span><span>Pluxee</span></div>
+  <div class="jobs">
+    <div class="job"><div class="jh"><b>PepsiCo</b><span class="when"><span class="pt">atual</span><span class="en">current</span></span></div><div class="role"><span class="pt">Especialista de Dados</span><span class="en">Data Specialist</span></div><p class="pt">Distribuição, produto, jurídico e marketing: testes de hipótese, estatística, indicadores e BI.</p><p class="en">Distribution, product, legal and marketing: hypothesis testing, statistics, KPIs and BI.</p></div>
+    <div class="job"><div class="jh"><b>AMBEV</b><span class="when"><span class="pt">atual</span><span class="en">current</span></span></div><div class="role"><span class="pt">Supply Chain · BI e análise (PJ)</span><span class="en">Supply Chain · BI and analysis (contractor)</span></div><p class="pt">Indicadores logísticos, tempo de parada de caminhões vs. orçamento, capacidade operacional.</p><p class="en">Logistics KPIs, truck downtime vs. budget, operational capacity.</p></div>
+    <div class="job"><div class="jh"><b>CI&amp;T</b><span class="when">2026</span></div><div class="role"><span class="pt">Lead Data Analyst</span><span class="en">Lead Data Analyst</span></div><p class="pt">Inferência estatística, sistemas multiagente e pipelines de dados em Databricks/Azure.</p><p class="en">Statistical inference, multi-agent systems and data pipelines on Databricks/Azure.</p></div>
+    <div class="job"><div class="jh"><b>Scirontech</b><span class="when">2024 – 2025</span></div><div class="role"><span class="pt">Lead Data Science e Analytics</span><span class="en">Lead Data Science and Analytics</span></div><p class="pt">Pipelines automatizados, modelagem de dados de plataforma SaaS, ML e dashboards em Power BI.</p><p class="en">Automated pipelines, SaaS data modeling, ML and Power BI dashboards.</p></div>
+    <div class="job"><div class="jh"><b>Pluxee</b><span class="when">2022 – 2024</span></div><div class="role"><span class="pt">Data Scientist</span><span class="en">Data Scientist</span></div><p class="pt">NLP para chamados, KPIs de growth, Power BI e ecossistema analítico em Azure/AWS.</p><p class="en">NLP for support tickets, growth KPIs, Power BI and analytics stack on Azure/AWS.</p></div>
+    <div class="job"><div class="jh"><b>act digital</b><span class="when">2021 – 2022</span></div><div class="role"><span class="pt">Data Scientist Consultant</span><span class="en">Data Scientist Consultant</span></div><p class="pt">Recomendação, churn, análise de grafos e NLP para previdência e vida.</p><p class="en">Recommendation, churn, graph analysis and NLP for pensions and life insurance.</p></div>
+    <div class="job"><div class="jh"><b>Valemobi</b><span class="when">2019 – 2021</span></div><div class="role"><span class="pt">Data Analyst</span><span class="en">Data Analyst</span></div><p class="pt">Product analytics e BI de produtos financeiros.</p><p class="en">Product analytics and BI for financial products.</p></div>
+  </div>
+</div></section>
+<section id="areas"><div class="wrap">
+  <h2><span class="pt">Áreas</span><span class="en">Areas</span></h2>
+  <p class="sub pt">Seis frentes, cada uma com seus projetos documentados.</p>
+  <p class="sub en">Six tracks, each with documented projects.</p>
+  <div class="grid">
+    <a class="card" href="https://github.com/Philipe-Micioneiro/data-science-portfolio/tree/main/01-data-analysis"><h3>01 · <span class="pt">Análise de dados</span><span class="en">Data analysis</span></h3><p class="pt">Exploração, limpeza e storytelling.</p><p class="en">Exploration, cleaning and storytelling.</p></a>
+    <a class="card" href="https://github.com/Philipe-Micioneiro/data-science-portfolio/tree/main/02-data-science-ml"><h3>02 · <span class="pt">Ciência de dados & ML</span><span class="en">Data science & ML</span></h3><p class="pt">Regressão, classificação, clusterização, NLP, séries temporais.</p><p class="en">Regression, classification, clustering, NLP, time series.</p></a>
+    <a class="card" href="https://github.com/Philipe-Micioneiro/data-science-portfolio/tree/main/03-ai-projects"><h3>03 · <span class="pt">Projetos de IA</span><span class="en">AI projects</span></h3><p class="pt">LLMs, RAG e agentes.</p><p class="en">LLMs, RAG and agents.</p></a>
+    <a class="card" href="https://github.com/Philipe-Micioneiro/data-science-portfolio/tree/main/04-streamlit-apps"><h3>04 · Streamlit</h3><p class="pt">Apps interativos publicados.</p><p class="en">Deployed interactive apps.</p></a>
+    <a class="card" href="https://github.com/Philipe-Micioneiro/data-science-portfolio/tree/main/05-power-bi"><h3>05 · Power BI</h3><p class="pt">Dashboards e modelagem.</p><p class="en">Dashboards and modeling.</p></a>
+    <a class="card" href="https://github.com/Philipe-Micioneiro/data-science-portfolio/tree/main/06-sql"><h3>06 · SQL</h3><p class="pt">Consultas analíticas e modelagem.</p><p class="en">Analytical queries and modeling.</p></a>
+  </div>
+</div></section>
+
+<section id="projetos"><div class="wrap">
+  <h2><span class="pt">Projetos</span><span class="en">Projects</span></h2>
+  <p class="sub pt">Trilha de 8 semanas (out–nov 2026), todos com dados públicos do e-commerce brasileiro Olist. Cada projeto terá problema, dados, método, resultado e como reproduzir.</p>
+  <p class="sub en">An 8-week track (Oct–Nov 2026), all on public data from the Brazilian e-commerce dataset Olist. Each project will cover problem, data, method, results and how to reproduce.</p>
+  <div class="grid">
+    <div class="card"><h3><span class="pt">P0 · Regressão linear do zero</span><span class="en">P0 · Linear regression from scratch</span></h3><p class="pt">Gradient descent e equação normal em NumPy, conferidos contra o scikit-learn.</p><p class="en">Gradient descent and normal equation in NumPy, checked against scikit-learn.</p><div class="chips"><span class="chip">NumPy</span><span class="chip">scikit-learn</span></div><span class="soon">● <span class="pt">previsto: semana 1</span><span class="en">planned: semana 1</span></span></div>
+    <div class="card"><h3><span class="pt">P1 · Tempo de entrega</span><span class="en">P1 · Delivery time</span></h3><p class="pt">Prever em quantos dias um pedido chega, sem vazamento de dados.</p><p class="en">Predict how many days an order takes, with no data leakage.</p><div class="chips"><span class="chip">Python</span><span class="chip">Pipeline</span><span class="chip">Ridge/Lasso</span></div><span class="soon">● <span class="pt">previsto: semanas 2–3</span><span class="en">planned: semanas 2–3</span></span></div>
+    <div class="card"><h3><span class="pt">P2 · O pedido vai atrasar?</span><span class="en">P2 · Will the order be late?</span></h3><p class="pt">Classificação com dados desbalanceados, limiar por custo e explicabilidade com SHAP. Projeto principal.</p><p class="en">Imbalanced classification, cost-based threshold and SHAP explainability. Flagship project.</p><div class="chips"><span class="chip">XGBoost</span><span class="chip">SHAP</span><span class="chip">PR-AUC</span></div><span class="soon">● <span class="pt">previsto: semanas 4–6</span><span class="en">planned: semanas 4–6</span></span></div>
+    <div class="card"><h3><span class="pt">P3 · Segmentação e anomalias</span><span class="en">P3 · Segmentation and anomalies</span></h3><p class="pt">Perfis de vendedores e fretes fora do padrão.</p><p class="en">Seller profiles and unusual freight costs.</p><div class="chips"><span class="chip">K-Means</span><span class="chip">DBSCAN</span><span class="chip">Isolation Forest</span></div><span class="soon">● <span class="pt">previsto: semana 6</span><span class="en">planned: semana 6</span></span></div>
+    <div class="card"><h3><span class="pt">P4 · Projeto reprodutível</span><span class="en">P4 · Reproducible project</span></h3><p class="pt">O P2 como produto: API, versionamento de dados e experimentos, tudo em container.</p><p class="en">P2 as a product: API, data and experiment versioning, all containerized.</p><div class="chips"><span class="chip">Docker</span><span class="chip">MLflow</span><span class="chip">DVC</span><span class="chip">FastAPI</span></div><span class="soon">● <span class="pt">previsto: semana 7</span><span class="en">planned: semana 7</span></span></div>
+    <div class="card"><h3><span class="pt">P5 · MLP vs gradient boosting</span><span class="en">P5 · MLP vs gradient boosting</span></h3><p class="pt">Quando deep learning compensa em dados tabulares, com números.</p><p class="en">When deep learning pays off on tabular data, with numbers.</p><div class="chips"><span class="chip">Keras</span></div><span class="soon">● <span class="pt">previsto: semana 8</span><span class="en">planned: semana 8</span></span></div>
+  </div>
+</div></section>
+
+<section id="contato"><div class="wrap">
+  <h2><span class="pt">Contato</span><span class="en">Contact</span></h2>
+  <div class="cta">
+    <a class="btn primary" href="mailto:micioneiro.bezerra@gmail.com">micioneiro.bezerra@gmail.com</a>
+    <a class="btn" href="https://github.com/Philipe-Micioneiro">GitHub</a>
+    <a class="btn" href="https://www.linkedin.com/in/philipemicioneiro">LinkedIn</a>
+  </div>
+</div></section>
+
+<footer><div class="wrap"><span class="pt">Todos os projetos usam dados públicos ou sintéticos.</span><span class="en">All projects use public or synthetic data.</span></div></footer>
+
+<script>
+(function(){
+  var root=document.documentElement, ls=null;
+  try{ls=window.localStorage}catch(e){}
+  function get(k){try{return ls&&ls.getItem(k)}catch(e){return null}}
+  function set(k,v){try{ls&&ls.setItem(k,v)}catch(e){}}
+  var lang=get('lang')||((navigator.language||'pt').toLowerCase().indexOf('pt')===0?'pt':'en');
+  function applyLang(l){root.lang=l==='en'?'en':'pt-BR';document.getElementById('lang').textContent=l==='en'?'PT':'EN';set('lang',l)}
+  applyLang(lang);
+  document.getElementById('lang').onclick=function(){lang=lang==='en'?'pt':'en';applyLang(lang)};
+  var th=get('theme'); if(th) root.setAttribute('data-theme',th);
+  document.getElementById('theme').onclick=function(){
+    var n=root.getAttribute('data-theme')==='light'?'dark':'light';root.setAttribute('data-theme',n);set('theme',n)};
+})();
+</script>
+</body>
+</html>
