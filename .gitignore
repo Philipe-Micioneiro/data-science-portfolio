@@ -1,0 +1,21 @@
+﻿# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+.env
+
+# Data & secrets
+*.csv.zip
+.env*
+*.key
+*.pem
+credentials*
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
